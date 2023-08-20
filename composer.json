@@ -1,0 +1,24 @@
+{
+    "name": "froq/docs",
+    "homepage": "http://github.com/froq/docs",
+    "description":  "Froq! Docs.",
+    "keywords": ["froq", "docs"],
+    "license": "Apache-2.0",
+    "authors": [{"name": "Kerem Güneş"}],
+    "require": {
+        "php": "^8.1",
+        "erusev/parsedown": "^1.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "app\\controller\\": "app/system"
+        }
+    },
+    "minimum-stability": "stable",
+    "scripts": {
+        "explore": "php -f bin/explore.php --"
+    },
+    "scripts-descriptions": {
+        "explore": "Generates an autoload map for app/system & app/library folders (@see bin/explore.php)."
+    }
+}
