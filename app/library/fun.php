@@ -11,8 +11,7 @@ function page_title() {
 }
 
 function page_description() {
-    // @fornow
-    return PAGE_DESCRIPTION;
+    return PAGE_DESCRIPTION; // @fornow
 }
 
 // function froq_data($key) {

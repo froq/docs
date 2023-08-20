@@ -1,19 +1,19 @@
 <?php
 namespace app\controller;
 
-use froq\http\response\Status;
-use froq\http\response\payload\Payload;
-use froq\file\FileSystem;
+use froq\file\File;
 
 class DocsController extends AppController
 {
+    const TITLE = 'Docs';
+
     function index($x = null)
     {
         if ($x === null) {
             [, $content] = $this->getDoc('_index');
 
             return $this->view('docs', [
-                'title'   => 'Documentation',
+                'title'   => self::TITLE,
                 'content' => $content
             ]);
         }
@@ -33,19 +33,25 @@ class DocsController extends AppController
     private function getDoc($x)
     {
         $name = xstring($x)
-            // Function "_" is internal.
-            ->replace(['-'], ['_'])
-            ->sub(0, 255) // Drop excessive parts.
-            ->lower()     // Lowerify name.
-            ->slug('_')   // Slugify name.
+            ->replace(['-'], ['_']) // Function "_" is internal.
+            ->slice(0, 50)          // Enough for a file name.
+            ->slug(preserve: '_')
         ;
 
-        $file = format('./app/system/docs/%s.md', $name);
+        $file = new File(format('./app/system/docs/%s.md', $name));
 
-        if (file_exists($file)) {
-            $title = null; // @todo
+        if ($file->exists()) {
+            $file->open();
 
-            $content = file_read($file);
+            $title = self::TITLE;
+            $upath = chop($this->request->getPath(), '/');
+
+            if (!hash_equals($upath, '/docs')) {
+                // Add extracting from first line (eg: # Application ..).
+                $title .= ' | ' . trim(grep('~# ([^\[]+)~', (string) $file->readLine()));
+            }
+
+            $content = $file->readAll();
             $content = (new \Parsedown)->text($content);
 
             return [$title, $content, true];
