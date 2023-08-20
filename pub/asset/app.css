@@ -1,0 +1,57 @@
+* { margin: 0; padding: 0; outline: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+/*body { font: 14px / 20px arial; color: #444; }*/
+body { font: 400 90% / 150% 'helvetica neue', helvetica, arial, sans; color: #555; }
+pre, code { font-family: "Source Code Pro", "Consolas", monospace !important; /*background-color: #f6f6f6; border-radius: 4px;*/ }
+pre { padding: 9px; line-height: 155% !important; } code:not([class*="language-"]) { font-size: 95%; /*padding: 0 4px 2px;*/ }
+a { color: blue; text-decoration: none; }
+a:hover { text-decoration: underline; }
+b { font-weight: 400; }
+p:not(:last-child) { margin-bottom: 12px; }
+ul, ol { list-style: none; }
+h1, h2, h3, h4, h5, h6 { font-weight: 500; margin-bottom: 6px; }
+
+.wrap { width: 85%; margin: 0 auto; }
+.sep { display: block; content: ""; margin: 12px 0; }
+
+.head { position: relative; font-size: 20px; border-bottom: 1px solid #111; padding: 10px 0; }
+    .head .logo { font-weight: bold; display: inline-block; }
+    .head .navi { display: inline-block; float: right; }
+        .head .navi a { margin-left: 5px; font-weight: 300; }
+
+.body { display: flex; justify-content: space-between; padding: 20px 0; }
+    .body .side { position: sticky; top: 20px; width: 19%; height: 100px; }
+        .body .side > * { display: block; }
+        .body .side > b { font-size: 120%; }
+    .body .main { width: 79%; min-height: 550px; }
+
+.foot { text-align: center; border-top: 1px solid #111; padding: 20px 0; }
+
+.docs > h1 { margin-bottom: 16px; position: relative; }
+    .docs > h1 > a { position: absolute; right: 0; top: 7px; color: inherit; font-size: 50%; line-height: 50%; visibility: hidden /* @temp (removed by js) */; }
+    .docs > h1 > a s { color: gray; text-decoration: none; }
+
+.docs > h2, .docs > h3, .docs h4 { margin-bottom: 12px; }
+    .docs > h2:not(:first-child), .docs > h3:not(:first-child), .docs > h4:not(:first-child) { margin-top: 24px; }
+    .docs > h2 > a, .docs > h3 > a, .docs > h4 > a { visibility: hidden; color: inherit; line-height: 100%; display: inline-block; width: 15px; text-decoration: none; text-align: center; margin: -5px 0 0 2px; }
+    .docs > h2:hover > a, .docs > h3:hover > a, .docs > h4:hover > a { visibility: unset; }
+
+/*.docs > h3 { margin-bottom: 10px; }*/
+    /*.docs > h3:not(:first-child) { margin-top: 20px; }*/
+
+/* override - prism */
+:not(pre) > code[class*="language-"], pre[class*="language-"] {background: #f6f6f6 !important; padding: 9px 12px !important; border: 1px solid #e9e9e9; border-radius: 4px}
+:not(pre) > code[class*="language-"] *, pre[class*="language-"] * {font-size: 12px !important; font-weight: normal !important; color: #333 !important; padding: 0;}
+.token.delimiter {color: #e33 !important}
+.token.operator {background: none !important}
+.token.keyword {color: #a28 !important}
+.token.string {color: #777 !important}
+.token.number {color: #c39 !important}
+.token.comment {color: #a6a6a6 !important}
+.token.class-name {color: #07a !important;}
+.token.function {color: #07a !important}
+.token.method {color: #74b !important}
+.token.package {color: #333 !important;}
+.token.constant, .token.boolean, .token.type-hint {color: #07a !important}
+.token.operator, .token.punctuation, .token.variable {color: #333 !important}
+/*.token.property {color: inherit !important}*/

@@ -1,0 +1,13 @@
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteRule . index.php [L]
+
+## Or more complex for statics
+# RewriteEngine On
+# RewriteCond %{DOCUMENT_ROOT}/pub/$1 -f
+# RewriteRule ^(.*)$ pub/$1 [L]
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_URI} !^.*\.(css|js|jpe?g|png|svg)$ [NC]
+# RewriteRule ^ pub/index.php [L,QSA]

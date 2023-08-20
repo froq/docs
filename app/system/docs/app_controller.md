@@ -1,0 +1,554 @@
+# Controller [THE_SOURCE_CODE](//github.com/froq/froq/blob/master/src/app/Controller.php)
+
+All controllers must extends `froq\app\Controller` that comes with many (frankly, tons of) handy *final* methods and some *readonly* properties. Probably the most important properties would be `$repository` (created by `$useRepository`), `$session` (created by `$useSession`) and `$view` (created by `$useView`).
+
+The other ones are `$app` (instance of `froq\App`), `$request` (instance of `froq\http\Request`, reference of `$app->request`), `$response` (instance of `froq\http\Response`, reference of `$app->response`).
+
+*Note: All methods in `froq\app\Controller` are declared as `final`, including `__construct()` & `__destruct()` methods (so instead, `init()` / `dinit()` methods can be declared in subcontrollers for these two methods as substitutes.*
+
+### Optional `$use` properties
+As you can see, all these `$use` properties must be declared in the subcontroller class as `true` (all defaults are `false`) and both `$repository` & `$session` properties / operations are dependent on the related config options (see [here](/docs/app#optional-properties-session-database-cache)).
+
+#### HTML site example
+```php
+// File: app/system/UserController.php
+namespace app\controller;
+
+use froq\app\Controller;
+use your\namespace\Login;
+
+class UserController extends Controller {
+    public bool $useRepository = true; // Requires "database" configs.
+    public bool $useSession = true;    // Requires "session" configs.
+    public bool $useView = true;       // Requires "view" configs.
+
+    public function loginAction() {
+        if ($this->request->isPost()) {
+            [$username, $password] = $this->request->post(['username', 'password']);
+
+            // Do some repository works here.
+            $user = $this->repository->findUserByUsername($username);
+
+            // All done within (just an example).
+            $okay = Login::execute($user, $password);
+
+            if ($okay) {
+                // Store user data if needed.
+                $this->session->set('user', $user);
+
+                // Redirect user to the dashboard.
+                return $this->response->redirect('/dashboard');
+            }
+
+            // To show login error to user.
+            $this->session->flash('login_failed', true);
+        }
+
+        return $this->view('login');
+    }
+}
+```
+
+#### API site example
+```php
+// File: app/system/TokenController.php
+namespace app\controller;
+
+use froq\app\Controller;
+use froq\http\response\Status;
+use your\namespace\{Login, Token};
+
+class TokenController extends Controller {
+    public bool $useRepository = true; // Requires "database" configs.
+
+    public function tokenAction() {
+        [$username, $password] = $this->request->post(['username', 'password']);
+
+        // Do some repository works here.
+        $user = $this->repository->findUserByUsername($username);
+
+        // All done within (just an example).
+        $okay = Login::execute($user, $password);
+
+        if ($okay) {
+            $token = new Token($user);
+            $token->persist();
+
+            // Send token payload.
+            return $this->jsonPayload(Status::OK, [
+                'token'  => $token->getValue(),
+                'expiry' => $token->getExpiry()
+            ]);
+        }
+
+        // Send error payload.
+        return $this->jsonPayload(Status::UNAUTHORIZED, [
+            'error' => 'Invalid credentials.'
+        ]);
+    }
+}
+```
+
+### Special methods
+Top controller class `froq\app\Controller` can recognise and call (invoke) some special methods that declared in subcontrollers and these methods;
+
+* `init()`: called in `__construct()` method.
+* `dinit()`: called in `__destruct()` method.
+* `before()`: called before a target action is called (not an action but a regular method as public).
+* `after()`: called after a target action is called (not an action but a regular method as public).
+* `index()`: where the all index stuff operated in a subcontroller (no `Action` prefix needed / allowed).
+* `error()`: where the all error stuff operated in a subcontroller (no `Action` prefix needed / allowed).
+
+<br class="sep">
+
+*Note: For a proper error handling process, `error()` method **must be declared** as per subcontroller or as once in a main subcontroller that's extended by other subcontrollers. Otherwise, in the absence of this method and in the time of error, you may not get any output response but can see the errors in log files.*
+
+#### Error handling with `error()` method
+If any internal error occurs, `error()` method is called with one argument (an instance of `Throwable`). The other calls depend on developers and must be declared keeping that `Throwable` class type in mind.
+
+```php
+// File: app/system/AppController.php
+namespace app\controller;
+
+use froq\app\Controller;
+use froq\http\HttpException;
+use froq\http\response\Status;
+use your\namespace\{
+    DatabaseException,
+    RecordValidationException,
+    RecordDuplicationException
+};
+use Throwable, SomeError, SomeOtherError;
+
+class AppController extends Controller {
+    // Basic example.
+    public function error(Throwable $e) {
+        switch (true) {
+            case ($e instanceof SomeError):
+                // Handle some error.
+                break;
+            case ($e instanceof SomeOtherError):
+                // Handle some other error.
+                break;
+            default:
+                // Handle default situation.
+        }
+    }
+
+    // Complex example (a bit).
+    public function error(Throwable|string $e) {
+        $status = null;
+
+        if ($e instanceof HttpException) {
+            $code = $e->getCode();
+            if ($code >= 400 && $code <= 599) {
+                $status = $code;
+            }
+        } elseif ($e instanceof DatabaseException) {
+            // Mock errors thrown in repositories.
+            $status = match (true) {
+                $e instanceof RecordValidationException
+                    => Status::BAD_REQUEST,
+                $e instanceof RecordDuplicationException
+                    => Status::CONFLICT,
+                default
+                    => null
+            };
+        }
+
+        // Set internal as default.
+        $status ??= Status::INTERNAL;
+    }
+}
+
+// File: app/system/TokenController.php
+namespace app\controller;
+
+...
+use froq\http\exception\client\{
+    BadRequestException,
+    NotFoundException
+};
+
+class TokenController extends AppController {
+    // All these exceptions below are gonna be caught
+    // in App::run() & sent to AppController::error().
+    public function tokenAction() {
+        [$username, $password] = $this->postParams(['username', 'password'], trim: true);
+
+        if (!$username || !$password) {
+            throw new BadRequestException();
+        }
+
+        $user = $this->repository->findUserByUsername($username);
+
+        if (!$user) {
+            throw new NotFoundException();
+        }
+    }
+}
+```
+
+### Internal HTTP-related errors
+Some `$e` instances coming as argument on `error()` can be caused by *No ... found* flavoured problems, for example, when no route, no controller / controller route or no action / action route found. If this the is case, then `$e` argument will be an instance of `froq\AppException` containing `$cause` property which is most probably an instance of `froq\http\exception\client\NotFoundException` for no route / controller / action found errors, or an instance of `froq\http\exception\client\NotAllowedException` for a route defined only with a request method like `GET`, `GET|POST` etc., and `getCause()` method as a getter method for `$cause` property.
+
+For more error / exception source, you can see [Thrownable](//github.com/froq/froq-common/blob/master/src/interface/Thrownable.php) / [ThrownableTrait](//github.com/froq/froq-common/blob/master/src/trait/ThrownableTrait.php) source files.
+
+*Note: `NotFoundException` exception can be thrown at the call of controller's `forward()`, `call()` and `callCallable()` methods if any not-found related error occurs during the runtime / calltime.* <br>
+*Note: `NotAllowedException` class is alias of `froq\http\exception\client\MethodNotAllowedException` class.*
+
+```php
+// Re-writing by the description above.
+public function error(Throwable $e) {
+    $status = null;
+
+    if ($e instanceof AppException) {
+        $cause = $e->getCause();
+        switch (true) {
+            case ($cause instanceof NotFoundException):
+                $status = $e->getCode();
+                // And do some work by that.
+                break;
+            case ($cause instanceof NotAllowedException):
+                $status = $e->getCode();
+                // And do some work by that too.
+                break;
+            // ...
+        };
+    }
+
+    // Set internal as default.
+    $status ??= Status::INTERNAL;
+}
+```
+
+### All-in-one API example with error handling
+
+```php
+// File: app/system/ApiController.php
+namespace app\controller;
+
+use froq\AppException;
+use froq\app\Controller;
+use froq\http\response\Status;
+use froq\http\response\payload\JsonPayload;
+use froq\http\exception\client\{NotFoundException, NotAllowedException};
+use Throwable;
+
+class ApiController extends Controller {
+    // Error procedure.
+    public final function error(Throwable $e): JsonPayload {
+        $error = $status = null;
+
+        if ($e instanceof AppException) {
+            $cause = $e->getCause();
+            switch (true) {
+                case ($cause instanceof NotFoundException):
+                    $error  = ['code' => 'URI_NOT_FOUND', 'text' => 'URI not found.'];
+                    $status = $e->getCode();
+                    break;
+                case ($cause instanceof NotAllowedException):
+                    $error  = ['code' => 'METHOD_NOT_ALLOWED', 'text' => 'Method not allowed.'];
+                    $status = $e->getCode();
+                    break;
+                // ...
+            };
+        }
+
+        // Defaults.
+        $error  ??= ['code' => 'INTERNAL', 'text' => 'Internal error'];
+        $status ??= Status::INTERNAL;
+
+        // Return, cos it's used as return in error process.
+        return $this->send($status, error: $error);
+    }
+
+    // Payload procedure.
+    public final function send(int $status, array $data = null, array $error = null): JsonPayload
+    {
+        return new JsonPayload($status, content: [
+            'status' => $status, 'data' => $data, 'error' => $error
+        ]);
+    }
+}
+
+// File: app/system/TokenController.php
+namespace app\controller;
+
+use froq\http\response\Status;
+use your\namespace\{Login, Token};
+
+class TokenController extends ApiController {
+    public bool $useRepository = true;
+
+    public function tokenAction() {
+        [$username, $password] = $this->postParams(['username', 'password']);
+
+        // Do some repository works here.
+        $user = $this->repository->findUserByUsername($username);
+
+        // All done within (just an example).
+        $okay = Login::execute($user, $password);
+
+        if ($okay) {
+            // Cache or save etc.
+            $token = new Token($user);
+            $token->persist();
+
+            // Send token payload.
+            return $this->send(Status::OK, data: [
+                'token'  => $token->getValue(),
+                'expiry' => $token->getExpiry()
+            ]);
+        }
+
+        // Send error payload.
+        return $this->send(Status::UNAUTHORIZED, error: [
+            'code' => 'INVALID_CREDENTIALS',
+            'text' => 'Invalid credentials.'
+        ]);
+    }
+}
+```
+
+A sample payload would probably be like the following examples, for both success / failure situations.
+
+```js
+// Success.
+{
+    "status": 200,
+    "data": {
+        "token": "VhPKPwQ5X7JFWueQAFgclER6zTUd8gKBYx3boEx5aI7bQtx ...",
+        "expiry": "2023-08-17T21:03:01+00:00",
+    },
+    "error": null
+}
+
+// Failure
+{
+    "status": 401,
+    "data": null,
+    "error": {
+        "code": "INVALID_CREDENTIALS",
+        "text": "Invalid credentials."
+    }
+}
+```
+
+### Getter methods
+Although some properties are public, they also can be retrieved via related methods like;
+
+```php
+// Property getters.
+$repository = $controller->getRepository();     // ?object(froq\app\Repository)
+$session    = $controller->getSession();        // ?object(froq\session\Session)
+$view       = $controller->getView();           // ?object(froq\app\View)
+
+// Others (e.g. PostController).
+$controller->getName();                         // "app\controller\PostController"
+$controller->getShortName();                    // "Post"
+$controller->getShortName(suffix: true);        // "PostController"
+$controller->getActionName());                  // "showAction"
+$controller->getActionShortName());             // "show"
+$controller->getActionShortName(suffix: true)); // "showAction"
+$controller->getPath();                         // Post.show
+$controller->getPath(full: true);               // app.controller.Post.showAction
+```
+
+### Working with parameters
+
+There are several ways to work with parameters in Froq!'s both HTTP & Controller system. One of them is **path parameters**, and the other ones are basically `$_GET`, `$_POST` etc. diallers that allow you to access & use in a comfy way enabling `...$options` arguments that can take some callables (`trim`, `map`, `filter` and `combine`) to retrieve these parameters as callable-applied, plus **segment parameters** as well.
+
+#### Path parameters
+
+Path parameters are retrieved in calltime of any path (route), passed to the action that being called in a controller at that time and can be used as typed or non-typed in that action method.
+
+*Note: Each parameter must have same name in both route config & method declaration, plus only `int|float|string|bool` types are operated as parameters type.*
+
+```php
+// File: app/controller/PostController.php
+// Route: /post/show/:id
+
+// With type declaration.
+public function showAction(int $id) {
+    // ...
+}
+
+// Without type declaration.
+public function showAction($id) {
+    $id = (int) $id;
+    // ...
+}
+```
+
+#### Path parameter methods
+
+```php
+/* Single parameters. */
+$controller->hasActionParam(name: 'id');                // true|false
+$controller->getActionParam(name: 'id', default: null); // "123"|123|null
+$controller->setActionParam(name: 'id', value: 123);    // in case of manipulation
+
+/* Multiple parameters. */
+// true if all set or, if names null and any param set
+$controller->hasActionParams(names: []|null);
+// array of given names' values, array of all params if names null, combine for name/value pairs
+$controller->getActionParams(names: []|null, defaults: []|null, combine: false);
+// in case of manipulation, params are name/value pairs
+$controller->setActionParams(params: []);
+```
+
+#### Global `$_GET`, `$_POST`, `$_COOKIE` parameter methods
+
+```php
+/* Get parameters. */
+$controller->getParam('name', default: null);
+$controller->getParams(['name'], defaults: []|null);
+
+/* Post parameters. */
+$controller->postParam('name', default: null);
+$controller->postParams(['name'], defaults: []|null);
+
+/* Cookie parameters. */
+$controller->cookieParam('name', default: null);
+$controller->cookieParams(['name'], defaults: []|null);
+```
+
+#### Segment methods
+
+Although, that segments property is defined as `$request->uri->segments` and ready-to-use after parsing the URI path, it can be utilised in controller instances too with the methods below (see [Segments](//github.com/froq/froq/blob/master/src/http/request/Segments.php)).
+
+```php
+// Route call: /post/show/123
+// No index 0: / 1 / 2 / 3
+
+/* Single parameters. */
+// "123"
+$controller->segment('show', default: null);
+// "123" (mind argument 3, as int and real index)
+$controller->segment(3, default: null);
+
+/* Multiple parameters. */
+// ["123"]
+$controller->segments(['show'], defaults: []|null);
+// ["123"] (mind argument [3], as [int] and real indexes)
+$controller->segments([3], defaults: []|null);
+// object(froq\http\request\Segments)
+$controller->segments();
+
+/* Named parameters. */
+// "123"
+$controller->segmentParam('show', default: null);
+// ["123"]
+$controller->segmentParams(['show'], defaults: []|null);
+```
+
+### Request & Response
+Froq! aims to provide a smooth HTTP interaction to its users (developers) so that they can enjoy while they're conding their projects, and to realise that it brings two components named as `froq\http\Request`, `froq\http\Response` and equipped with many useful properties / methods. You can find more details about [Request](/docs/http-request) and [Response](/docs/http-response) documents.
+
+#### Getting GET|POST|COOKIE params
+There are several ways of getting request parameters, and this can be done using methods below that basically utilise `fetch()` method of `froq\http\request\Params` class ([source](//github.com/froq/froq/blob/master/src/http/request/Params.php)).
+
+_Note: All usages are same for `get*`, `post*` and `cookie*` methods of both controller and request objects._
+_Note: If a parameter isn't set, provied `map` or other callables won't be applied and `null` or given default will be returned._
+
+```php
+public function someAction() {
+    /* Controller methods. */
+    $param = $this->getParam('param', default: null);
+    [$param1, $param2] = $this->getParams(['param1', 'param2'], default: null);
+
+    $trimmedParam = $this->getParam('param', default: '', trim: true);
+    $trimmedParam = $this->getParam('param', default: '', map: 'trim');
+
+    // Safe example (e.g. "id=%20%20%00123").
+    $id = $this->getParam('id', map: 'trim|int'); // int(123)
+    // Complex example (e.g. "ids=1,2,3").
+    $ids = $this->getParam('ids', map: fn($s) => map(split(',', $s), 'int')); // array<int>[1,2,3]
+
+    /* Nulls, defaults & callables (map, filter etc). */
+    // null if no $_GET['id'] isn't set (like no ?id=...).
+    $id = $this->getParam('id', map: 'trim|int');
+    // -1 if no $_GET['id'] isn't set (like no ?id=...).
+    $id = $this->getParam('id', default: -1, map: 'trim|int');
+
+    // The rest of same.
+    $this->postParam(...); $this->postParams(...);
+    $this->cookieParam(...); $this->cookieParams(...);
+
+
+    /* Request methods. */
+    $id = $this->request->get('id', default: null, map: 'int');
+    [$id, $name] = $this->request->get(['id', 'name'], default: null, trim: true);
+
+    // The rest of same.
+    $this->request->post(...);  $this->request->cookie(...);
+    $this->request->getParam(...); $this->request->getParams(...);
+    $this->request->postParam(...); $this->request->postParams(...);
+    $this->request->cookieParam(...); $this->request->cookieParams(...);
+
+    // These are explainded above already.
+    $this->request->segmentParam(...); $this->request->segmentParams(...);
+}
+```
+
+### Sending response & payloads
+You can send any type of response by using `froq\Controller::response()` method.
+
+```php
+use froq\http\response\Status;
+// ...
+
+public function someAction() {
+    // Set a plain / json text payload.
+    return $this->response(Status::OK, 'Hello, world!', ['type' => 'text/plain']);
+    return $this->response(Status::OK, ['msg' => 'Hello, world!'], ['type' => 'text/json']);
+
+    // Set an image payload (size & modifiedAt auto-detect if none).
+    $attributes = [
+        'type' => 'image/jpeg', 'size' => 1024,  // In bytes, like filesize().
+        'modifiedAt' => 'unix-time or iso-date', // For headers.
+        'expiresAt' => 'unix-time or iso-date',  // For headers.
+        'etag' => 'f5a1bffbf0ae28c7558792d ...'  // For headers.
+    ];
+    return $this->response(Status::OK, 'path/to/file.jpeg', $attributes);
+    // return $this->response(Status::OK, 'contents/of/file.jpeg', $attributes);
+}
+```
+
+Plus, thanks to Froq! [HTTP Payload](/docs/http-payloads) components, you can easily send payloads with a status code (HTTP code) and attributes (e.g. `type` for content type or `charset` for content charset etc.) and its content as well.
+
+```php
+use froq\http\response\Status;
+use froq\http\response\payload\{
+    Payload,
+    HtmlPayload, PlainPayload
+    JsonPayload, XmlPayload
+    ImagePayload, FilePayload
+};
+// ...
+
+public function someAction() {
+    // Parameters are same as the response() method above.
+    return $this->payload(Status::OK, 'Hello, world!', ['type' => 'text/plain']);
+    // return new Payload(Status::OK, 'Hello, world!', ['type' => 'text/plain']);
+
+    return $this->htmlPayload(Status::OK, '<p>Hello, world!</p>');
+    // return new HtmlPayload(Status::OK, '<p>Hello, world!</p>');
+
+    // So on ...
+}
+```
+
+### Flashes
+
+### Other Controller Calls
+
+### Forward & Redirect ?
+
+### Misc. methods
+env(), forward(), redirect(), createHttpException()
+
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
+<br><br><br><br><br><br><br><br>
