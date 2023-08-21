@@ -324,7 +324,7 @@ A sample payload would probably be like the following examples, for both success
     "error": null
 }
 
-// Failure
+// Failure.
 {
     "status": 401,
     "data": null,
