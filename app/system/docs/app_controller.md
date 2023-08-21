@@ -500,11 +500,11 @@ use froq\http\response\Status;
 // ...
 
 public function someAction() {
-    // Set a plain / json text payload.
+    // Send a plain / json text payload.
     return $this->response(Status::OK, 'Hello, world!', ['type' => 'text/plain']);
     return $this->response(Status::OK, ['msg' => 'Hello, world!'], ['type' => 'text/json']);
 
-    // Set an image payload (size & modifiedAt auto-detect if none).
+    // Send (display) an image payload (size & modifiedAt auto-detect if none).
     $attributes = [
         'type' => 'image/jpeg', 'size' => 1024,  // In bytes, like filesize().
         'modifiedAt' => 'unix-time or iso-date', // For headers.
@@ -521,6 +521,7 @@ Plus, thanks to Froq! [HTTP Payload](/docs/http-payloads) components, you can ea
 ```php
 use froq\http\response\Status;
 use froq\http\response\payload\{
+    // Available payload classes.
     Payload,
     HtmlPayload, PlainPayload
     JsonPayload, XmlPayload
@@ -541,14 +542,71 @@ public function someAction() {
 ```
 
 ### Flashes
+To keep and use some casual / temporary data in sessions, you can use `froq\app\Controller::flash()` method that's basically a proxy method of `froq\session\Session::flash()` method.
 
-### Other Controller Calls
+_Note: Including `flash()` method, all session features will require `session` options in config file._
 
-### Forward & Redirect ?
+```php
+public function loginAction() {
+    // ...
+
+    if ($loginIsNotOkay) {
+        // Set login error.
+        $this->flash('login_failed', true);
+
+        return $this->redirect('/login');
+    }
+
+    // Get login error if exists.
+    $loginFailed = $this->flash('login_failed');
+
+    return $this->view('login', ['login_failed' => $loginFailed]);
+}
+```
+
+### Forward / redirect
+To forward, actuall to call an other controller's method, you can use `froq\app\Controller::forward()` method by passing the target method with its arguments if any.
+
+_Note: The `forward()` method is for only action calls, meaning that, excluding `index()` and `error()` methods, an `Action` suffix will be added to the given target method, and also `Controller` suffix to its controller._
+
+```php
+public function someAction() {
+    // For FooController::barAction().
+    $return = $this->forward('Foo.bar');
+}
+```
+
+To redirect the client to another URI / URL, you can use `froq\app\Controller::redirect()` method that's basically a proxy method of `froq\http\Response::redirect()` method.
+
+```php
+public function someAction() {
+    // Simple usage.
+    return $this->redirect('/another-target');
+
+    // Complete usage.
+    return $this->redirect(
+        '/another-target?id=%d',
+        [123],                  // For format('...?id=%d').
+        code: Status::FOUND,    // 3xx HTT code.
+        body: '...',            // Just in case.
+        headers: ['k/v pairs'], // HTTP headers to send with direction.
+        cookies: ['k/v pairs'], // HTTP cookies to send with direction.
+    );
+}
+```
 
 ### Misc. methods
-env(), forward(), redirect(), createHttpException()
 
-<br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br>
-<br><br><br><br><br><br><br><br>
+```php
+// Initialize a controller instance.
+$someController = $this->initController('Some');
+$someController = $this->initController('some\Some');
+
+// Initialize a repository instance.
+$someRepository = $this->initRepository('Some');
+$someRepository = $this->initRepository('some\Some');
+
+// Create an HTTP exception with code.
+$e = $this->createHttpException(401);
+$e = $this->createHttpException(Status::UNAUTHORIZED);
+```
