@@ -1,6 +1,8 @@
 # Controller [THE_SOURCE_CODE](//github.com/froq/froq/blob/master/src/app/Controller.php)
 
-All controllers must extends `froq\app\Controller` that comes with many (frankly, tons of) handy *final* methods and some *readonly* properties. Probably the most important properties would be `$repository` (created by `$useRepository`), `$session` (created by `$useSession`) and `$view` (created by `$useView`).
+All controllers must extends `froq\app\Controller` class that comes with many (frankly, tons of) handy *final* methods and some *readonly* properties.
+
+Probably the most important properties would be `$repository` (created by `$useRepository`), `$session` (created by `$useSession`) and `$view` (created by `$useView`).
 
 The other ones are `$app` (instance of `froq\App`), `$request` (instance of `froq\http\Request`, reference of `$app->request`), `$response` (instance of `froq\http\Response`, reference of `$app->response`).
 
