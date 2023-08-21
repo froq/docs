@@ -402,6 +402,8 @@ $controller->setActionParams(params: []);
 
 #### Global `$_GET`, `$_POST`, `$_COOKIE` parameter methods
 
+*Note: All JSON (`/json` containing) requests are automatically parsed to `$_POST` global.*
+
 ```php
 /* Get parameters. */
 $controller->getParam('name', default: null);
