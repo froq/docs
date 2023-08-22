@@ -44,6 +44,12 @@
         <a href="/docs/database-queries-results">Queries & Results</a>
         <a href="/docs/database-transactions">Transactions</a>
         <a href="/docs/database-entities">Entities</a>
+        <br>
+        <b>Utilities</b>
+        <a href="/docs/sugars">Sugars</a>
+        <a href="/docs/sugar-classes">Sugar Classes</a>
+        <a href="/docs/sugar-classes">Sugar Functions</a>
+        <a href="/docs/sugar-classes">Sugar Constants</a>
     </div>
 </div>
 
