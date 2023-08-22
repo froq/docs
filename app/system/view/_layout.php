@@ -121,21 +121,23 @@ froq.ready(() => {
         }
     });
 
+    // const reBinTypes = /^\??(int|float|string|bool|array|object|callable|iterable|mixed)\s*$/
+    const reClassName = /^\??[A-Z][a-z]*/
+    const replaceNodes = (nodes) => {
+        let rep = document.createElement("span");
+        rep.className = "token class-name";
+
+        for (let node of nodes) {
+            rep = rep.cloneNode();
+            rep.textContent = node.textContent;
+            node.replaceWith(rep);
+        }
+    };
+
     // Prism (fix class & namespace names).
     froq.findAll(".token.class-name, .token.scope, .token.package").forEach(el => {
         let txt = getText(el);
         let prev, next;
-
-        const replaceNodes = (nodes) => {
-            let rep = document.createElement("span");
-            rep.className = "token class-name";
-
-            for (let node of nodes) {
-                rep = rep.cloneNode();
-                rep.textContent = node.textContent;
-                node.replaceWith(rep);
-            }
-        };
 
         // acme\Foo, acme\Foo::BAR
         if (txt.includes("\\")) {
@@ -207,6 +209,30 @@ froq.ready(() => {
             el.classList.add("class-name");
         }
     });
+
+    // Prism (add arg type).
+    froq.findAll(".token.function").forEach(el => {
+        let nodes = [], next = el.nextSibling;
+
+        if (next.textContent === "(") {
+            let nodes = [];
+
+            while (next && next.textContent !== ")") {
+                if (
+                    // Plain text (others are span).
+                    next.nodeType === Node.TEXT_NODE
+                    // Only classes (for now?).
+                    && reClassName.test(next.textContent)
+                ) {
+                    nodes.push(next);
+                }
+                next = next.nextSibling;
+            }
+
+            replaceNodes(nodes);
+        }
+    });
+
 
     // Prism (fix array/null keywords).
     froq.findAll(".token.keyword").forEach(el => {
