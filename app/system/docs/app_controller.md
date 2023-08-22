@@ -552,16 +552,18 @@ _Note: Including `flash()` method, all session features will require `session` o
 
 ```php
 public function loginAction() {
-    // ...
+    if ($this->request->isPost()) {
+        // ...
 
-    if ($loginIsNotOkay) {
-        // Set login error.
-        $this->flash('login_failed', true);
+        if ($loginIsNotOkay) {
+            // Set login error.
+            $this->flash('login_failed', true);
 
-        return $this->redirect('/login');
+            return $this->redirect('/login');
+        }
     }
 
-    // Get login error if exists.
+    // Get login error (if exists).
     $loginFailed = $this->flash('login_failed');
 
     return $this->view('login', ['login_failed' => $loginFailed]);
