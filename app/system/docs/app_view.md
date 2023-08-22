@@ -80,7 +80,7 @@ class UserController extends Controller {
 ```
 
 ```php
-// File: app/system/view/login.php
+<!-- File: app/system/view/login.php -->
 <?php if ($login_failed): ?>
     <div class="error">Invalid login.</div>
 <?php endif ?>
