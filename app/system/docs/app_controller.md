@@ -450,6 +450,38 @@ $controller->segmentParams(['show'], defaults: []|null);
 ### Request & Response
 Froq! aims to provide a smooth HTTP interaction to its users (developers) so that they can enjoy while they're conding their projects, and to realise that it brings two components named as `froq\http\Request`, `froq\http\Response` and equipped with many useful properties / methods. You can find more details about [Request](/docs/http-request) and [Response](/docs/http-response) documents.
 
+#### Injecting `Request` & `Response` objects
+It's easy to inject these objects into an action in-place and on-demand by declaring these actions with the arguments that typed as `froq\http\Request` and/or `froq\http\Response` types. While these arguments will automatically be passed to the action (that's being called), the other arguments will also be passed to this action (regardless of their place / order).
+
+Although you can inject these objects into any action, they are just references of `$controller->request` and `$controller->response` properties and instead of injecting them, you can also use they just like `$this->request` or `$this->response`.
+
+```php
+use froq\http\{Request, Response};
+// ...
+
+// With path params.
+public function someAction(int $id, Request $request, Response $response) {
+    $content = [
+        'id' => $id,
+        'request_time' => $request->time,
+        'request_utime' => $request->utime,
+    ];
+
+    $response->json(Status::OK, $content, /* headers: array, cookies: array */);
+}
+
+// Without path params.
+public function someAction(Request $request, Response $response) {
+    $content = [
+        'request_time' => $request->time,
+        'request_utime' => $request->utime,
+    ];
+
+    $response->json(Status::OK, $content, /* headers: array, cookies: array */);
+}
+```
+
+
 #### Getting GET|POST|COOKIE params
 There are several ways of getting request parameters, and this can be done using methods below that basically utilise `fetch()` method of `froq\http\request\Params` class ([source](//github.com/froq/froq/blob/master/src/http/request/Params.php)).
 
@@ -521,6 +553,8 @@ public function someAction() {
 ```
 
 Plus, thanks to Froq! [HTTP Payload](/docs/http-payloads) components, you can easily send payloads with a status code (HTTP code) and attributes (e.g. `type` for content type or `charset` for content charset etc.) and its content as well.
+
+_Note: Payloads are simply read-only objects, so you can only set (give) their data for once since they've no setters._
 
 ```php
 use froq\http\response\Status;
