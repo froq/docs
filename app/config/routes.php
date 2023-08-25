@@ -8,7 +8,7 @@ return [
 
     ['/', 'Home'],
     ['/docs', 'Docs'],
-    ['/docs/:x', 'Docs'],
+    ['/docs/:id', 'Docs'],
 
     // More..
     // ['/user/:id', ['GET' => 'User.show']],

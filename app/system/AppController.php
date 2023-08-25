@@ -2,24 +2,23 @@
 namespace app\controller;
 
 use froq\http\response\Status;
+use Throwable;
 
-class AppController extends \froq\app\Controller
-{
-    var bool $useView = true;
+class AppController extends \froq\app\Controller {
+    public bool $useView = true;
 
     /** Init. */
-    function init()
-    {
+    public function init(): void {
         $this->includeFunctions();
     }
 
     /** Index. */
-    function index()
-    {}
+    public function index(): string {
+        return ''; // No-op.
+    }
 
     /** Error. */
-    function error($e = null)
-    {
+    public function error(Throwable $e = null): string {
         // @todo: remove?
         ini_set('display_errors', false);
 
@@ -35,13 +34,11 @@ class AppController extends \froq\app\Controller
         return $this->view('_error', ['code' => $code, 'message' => $message], $code);
     }
 
-    protected function fail($code)
-    {
+    protected function fail(int $code): string {
         return $this->error($this->createHttpException($code));
     }
 
-    private function includeFunctions()
-    {
+    private function includeFunctions(): void {
         include_once APP_DIR . '/app/library/fun.php';
     }
 }

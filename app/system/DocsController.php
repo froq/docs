@@ -2,14 +2,13 @@
 namespace app\controller;
 
 use froq\file\File;
+use Parsedown;
 
-class DocsController extends AppController
-{
-    const TITLE = 'Docs';
+class DocsController extends AppController {
+    private const TITLE = 'Docs';
 
-    function index($x = null)
-    {
-        if ($x === null) {
+    public function index(string $id = null): string {
+        if (!$id) {
             [, $content] = $this->getDoc('_index');
 
             return $this->view('docs', [
@@ -18,7 +17,7 @@ class DocsController extends AppController
             ]);
         }
 
-        [$title, $content, $ok] = $this->getDoc($x);
+        [$title, $content, $ok] = $this->getDoc($id);
 
         if ($ok) {
             return $this->view('docs', [
@@ -30,9 +29,8 @@ class DocsController extends AppController
         return $this->fail(404);
     }
 
-    private function getDoc($x)
-    {
-        $name = xstring($x)
+    private function getDoc(string $id): array {
+        $name = xstring($id)
             ->replace(['-'], ['_']) // Function "_" is internal.
             ->slice(0, 50)          // Enough for a file name.
             ->slug(preserve: '_')
@@ -46,13 +44,14 @@ class DocsController extends AppController
             $title = self::TITLE;
             $upath = chop($this->request->getPath(), '/');
 
+            // Skip index page.
             if (!hash_equals($upath, '/docs')) {
-                // Add extracting from first line (eg: # Application ..).
-                $title .= ' | ' . trim(grep('~# ([^\[]+)~', (string) $file->readLine()));
+                // Append title extracting it from first line (eg: # Application ..).
+                $title .= ' | ' . trim(grep('~# +([^\[]+)~', (string) $file->readLine()));
             }
 
             $content = $file->readAll();
-            $content = (new \Parsedown)->text($content);
+            $content = (new Parsedown)->text($content);
 
             return [$title, $content, true];
         }
