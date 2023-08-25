@@ -128,7 +128,7 @@ froq.ready(() => {
     });
 
     // const reBinTypes = /^\??(int|float|string|bool|array|object|callable|iterable|mixed)\s*$/
-    const reClassName = /^\??[A-Z][a-z]*/
+    const reClassName = /^[\?\s]?[A-Z][a-z]*/
     const replaceNodes = (nodes) => {
         let rep = document.createElement("span");
         rep.className = "token class-name";
