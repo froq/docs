@@ -4,9 +4,14 @@ namespace app\controller;
 use froq\file\File;
 use Parsedown;
 
+/**
+ * Docs Controller.
+ * Route: /docs, /docs/:id
+ */
 class DocsController extends AppController {
     private const TITLE = 'Docs';
 
+    /** @override */
     public function index(string $id = null): string {
         if (!$id) {
             [, $content] = $this->getDoc('_index');
@@ -29,6 +34,9 @@ class DocsController extends AppController {
         return $this->fail(404);
     }
 
+    /**
+     * Get a doc contents after parsing.
+     */
     private function getDoc(string $id): array {
         $name = xstring($id)
             ->replace(['-'], ['_']) // Function "_" is internal.

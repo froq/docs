@@ -4,6 +4,10 @@ namespace app\controller;
 use froq\http\response\Status;
 use Throwable;
 
+/**
+ * App Controller.
+ * Route: n/a
+ */
 class AppController extends \froq\app\Controller {
     public bool $useView = true;
 
