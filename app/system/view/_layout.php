@@ -33,6 +33,7 @@
         <a href="/docs/app-controller">Controller</a>
         <a href="/docs/app-repository">Repository</a>
         <a href="/docs/app-view">View</a>
+        <a href="/docs/app-routing">Routing</a>
         <br>
         <b>HTTP & Components</b>
         <a href="/docs/http-request">Request</a>
