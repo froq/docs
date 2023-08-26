@@ -47,10 +47,10 @@
         <a href="/docs/database-entities">Entities</a>
         <br>
         <b>Utilities</b>
-        <a href="/docs/sugars">Sugars</a>
-        <a href="/docs/sugar-classes">Sugar Classes</a>
-        <a href="/docs/sugar-classes">Sugar Functions</a>
-        <a href="/docs/sugar-classes">Sugar Constants</a>
+        <a href="/docs/util-sugars">Sugars</a>
+        <a href="/docs/util-sugar-classes">Sugar Classes</a>
+        <a href="/docs/util-sugar-functions">Sugar Functions</a>
+        <a href="/docs/util-sugar-constants">Sugar Constants</a>
     </div>
 </div>
 
