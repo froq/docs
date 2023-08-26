@@ -6,11 +6,11 @@ return [
     // Note: Controller & Action suffixes are not needed.
     // So "Index.favicon" => "system/Index/IndexController::faviconAction()".
 
-    ['/', 'Home'],
-    ['/docs', 'Docs'],
-    ['/docs/:id', 'Docs'],
+    '/' => 'Home',
+    '/docs' => 'Docs',
+    '/docs/:id' => 'Docs',
 
     // More..
-    // ['/user/:id', ['GET' => 'User.show']],
-    // ['/user/:id', ['GET' => function ($id) { ... }]],
+    // '/user/:id' => ['GET' => 'User.show'],
+    // '/user/:id' => ['GET' => function ($id) { ... }],
 ];
