@@ -7,7 +7,7 @@ namespace app\controller;
  */
 class HomeController extends AppController {
     /** @override */
-    function index(): string {
+    public function index(): string {
         return $this->view('home');
     }
 }
