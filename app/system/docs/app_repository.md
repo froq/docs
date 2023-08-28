@@ -45,6 +45,7 @@ use froq\http\response\Status;
 
 class BookController extends Controller {
     public bool $useRepository = true;
+    public bool $useView = true;
 
     public function showAction(int $id) {
         /** @var array|null */
@@ -76,17 +77,35 @@ class BookController extends Controller {
 ```
 
 ### Using entities
+Since all repositories come with some query and CRUD methods, it's possible to use them directly with entities without creating and user-declared methods in your repositories.
+
 ```php
 // File: app/entity/Book.php
 namespace app\entity;
 
-#[meta(table: "books", primary: "id")]
+#[meta(table: 'books', primary: 'id')]
 class Book extends \froq\database\entity\Entity {
-    #[meta(field: "id")]
-    var $id;
+    #[meta(field: 'id')]
+    public $id;
 
-    #[meta(field: "name")]
-    var $name;
+    #[meta(field: 'name')]
+    public $name;
+
+    #[meta(field: 'price')]
+    public $price;
+
+    #[meta(field: 'isbn')]
+    public $isbn;
+
+    // For save() calls.
+    public function validations() {
+        return [
+            'id'    => ['type' => 'int'],
+            'name'  => ['type' => 'string', 'required'],
+            'price' => ['type' => 'float',  'required'],
+            'isbn'  => ['type' => 'string', 'required']
+        ];
+    }
 }
 ```
 
@@ -103,39 +122,114 @@ namespace app\controller;
 
 use app\entity\{Book, BookList};
 use froq\http\response\Status;
+use froq\validation\ValidationError;
+use Throwable;
 
 class BookController extends \froq\app\Controller {
     public bool $useRepository = true;
 
+    /** @call POST /book */
+    public function addAction() {
+        $book = $error = null;
+
+        try {
+            /** @var Book */
+            $book = $this->repository->save(new Book(
+                // "..." will call Entity.fill() method to set properties.
+                ...$this->request->post(['name', 'isbn', 'price'], combine: true)
+            ));
+            // If no such book saved, isSaved() = false.
+            $status = $book->isSaved() ? Status::CREATED : Status::RETRY_WITH;
+        } catch (ValidationError $e) {
+            $status = Status::BAD_REQUEST;
+            $error['details'] = $e->errors();
+        } catch (Throwable) {
+            $status = Status::INTERNAL_SERVER_ERROR;
+            $error['details'] = 'Internal server error';
+        }
+
+        return $this->response->json($status, ['book' => $book, 'error' => $error]);
+    }
+
+    /** @call PUT /book/:id */
+    public function updateAction(int $id) {
+        $book = $error = null;
+
+        try {
+            /** @var Book */
+            $book = $this->repository->save(new Book(
+                // Assign target id.
+                id: $id,
+                // "..." will call Entity.fill() method to set properties.
+                ...$this->request->post(['name', 'isbn', 'price'], combine: true)
+            ));
+            // If no such book found, isSaved() = false.
+            $status = $book->isSaved() ? Status::ACCEPTED : Status::NOT_FOUND;
+        } catch (ValidationError $e) {
+            $status = Status::BAD_REQUEST;
+            $error['details'] = $e->errors();
+        } catch (Throwable) {
+            $status = Status::INTERNAL_SERVER_ERROR;
+            $error['details'] = 'Internal server error';
+        }
+
+        return $this->response->json($status, ['book' => $book, 'error' => $error]);
+    }
+
+    /** @call DELETE /book/:id */
+    public function deleteAction(int $id) {
+        /** @var Book */
+        $book = $this->repository->remove(new Book(id: $id));
+        $status = $book->isRemoved() ? Status::OK : Status::NOT_FOUND;
+
+        return $this->response->json($status, ['book' => $book]);
+    }
+
+    /** @call GET /book/:id */
     public function showAction(int $id) {
         /** @var Book */
         $book = $this->repository->find(new Book(id: $id));
         $status = $book->isFound() ? Status::OK : Status::NOT_FOUND;
 
-        return $this->view('show', data: ['book' => $book], status: $status);
+        return $this->response->json($status, ['book' => $book]);
     }
 
+    /** @call GET /book */
+    public function listAction() {
+        /** @var BookList<Book> */
+        $books = $this->repository->findBy(Book::class, ...$this->getLimitOffset());
+        $status = $books->isNotEmpty() ? Status::OK : Status::NOT_FOUND;
+
+        return $this->response->json($status, ['books' => $books->toArray()]);
+    }
+
+    /** @call GET /book/search */
     public function searchAction() {
         $qb = $this->repository->initQuery();
 
         /** @var UrlQuery|null (sugar) */
         if ($q = $this->request->query()) {
-            $page = (int) $q->get('page');
 
             $q->has('isbn') && $qb->in('isbn', $q->get('isbn'));
             $q->has('price') && $qb->between('price', $q->get('price'));
             // ...
-
-            $page && $qb->paginate($page);
         }
 
         /** @var BookList<Book> */
-        $books = $this->repository->findBy(new Book(), $qb);
+        $books = $this->repository->findBy(Book::class, $qb, ...$this->getLimitOffset());
         $status = $books->isNotEmpty() ? Status::OK : Status::NOT_FOUND;
 
-        return $this->view('search', data: ['books' => $books], status: $status);
+        return $this->response->json($status, ['books' => $books->toArray()]);
+    }
+
+    private function getLimitOffset() {
+        $limit = (int) $this->getParam('limit', 10);
+        $offset = $limit * ((int) $this->getParam('page'));
+
+        if ($limit > 100) $limit = 100;
+
+        // As named arguments (limit: .., offset: ..).
+        return ['limit' => $limit, 'offset' => $offset];
     }
 }
 ```
-
-<br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
