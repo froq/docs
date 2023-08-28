@@ -261,6 +261,13 @@ froq.ready(() => {
         }
     });
 
+    // Prism (remove # comments).
+    froq.findAll(".language-php > .comment").forEach(el => {
+        if (el.textContent.startsWith("#")) {
+            el.classList.replace("comment", "comment--");
+        }
+    });
+
     // Prism (bash comments).
     froq.findAll("code.language-bash").forEach(el => {
         if (el.textContent.includes("# ")) {
