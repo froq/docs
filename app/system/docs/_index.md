@@ -30,8 +30,6 @@ Library    : app\library\PostHelper        => app/library/PostHelper.php
 
 <br class="sep">
 
-
-
 ### Local Development with Built-in Web Server
 
 ```bash
