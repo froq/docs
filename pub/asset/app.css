@@ -20,7 +20,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; margin-bottom: 6px; }
         .head .navi a { margin-left: 5px; font-weight: 300; }
 
 .body { display: flex; justify-content: space-between; padding: 20px 0; }
-    .body .side { position: sticky; top: 20px; width: 19%; height: 100px; }
+    .body .side { position: sticky; top: 20px; width: 19%; max-height: 530px; overflow-y: auto; }
         .body .side > * { display: block; }
         .body .side > b { font-size: 120%; }
     .body .main { width: 79%; min-height: 550px; }

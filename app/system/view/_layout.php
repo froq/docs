@@ -285,7 +285,7 @@ froq.ready(() => {
     });
 
     // Main container height.
-    froq.find(".main").style.minHeight = froq.find(".side").scrollHeight + "px";
+    // froq.find(".main").style.minHeight = froq.find(".side").scrollHeight + "px";
 })
 </script>
 
