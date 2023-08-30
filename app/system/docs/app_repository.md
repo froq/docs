@@ -91,19 +91,19 @@ class Book extends \froq\database\entity\Entity {
     #[meta(field: 'name')]
     public $name;
 
-    #[meta(field: 'price')]
-    public $price;
-
     #[meta(field: 'isbn')]
     public $isbn;
+
+    #[meta(field: 'price')]
+    public $price;
 
     // For save() calls.
     public function validations() {
         return [
             'id'    => ['type' => 'int'],
             'name'  => ['type' => 'string', 'required'],
-            'price' => ['type' => 'float',  'required'],
             'isbn'  => ['type' => 'string', 'required']
+            'price' => ['type' => 'float',  'required'],
         ];
     }
 }
