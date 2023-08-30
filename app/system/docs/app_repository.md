@@ -139,7 +139,7 @@ class BookController extends \froq\app\Controller {
                 ...$this->request->post(['name', 'isbn', 'price'], combine: true)
             ));
             // If no such book saved, isSaved() = false.
-            $status = $book->isSaved() ? Status::CREATED : Status::RETRY_WITH;
+            $status = $book->isSaved() ? Status::CREATED : Status::INTERNAL;
         } catch (ValidationError $e) {
             $status = Status::BAD_REQUEST;
             $error['details'] = $e->errors();
