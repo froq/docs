@@ -1,12 +1,12 @@
 # Repository [THE_SOURCE_CODE](//github.com/froq/froq/blob/master/src/app/Repository.php)
 
-All repositories must extend `froq\app\Repository` class that comes some handy *final* method and *protected* properties.
+All repositories must extend `froq\app\Repository` class that comes some handy *final* methods and *protected* properties.
 
-These properties are `$db` (instance of `froq\database\Database`) for query and CRUD operations and `$em` (instance of `froq\database\entity\EntityManager`) for entity operations.
+These properties are `$db` (instance of `froq\database\Database`) for CRUD & query operations and `$em` (instance of `froq\database\entity\EntityManager`) for entity operations.
 
-Additionally, all repositories provide a proxy interface for some query and CRUD methods of `froq\database\entity\EntityManager` class via `froq\database\trait\RepositoryTrait::__call()` method ([source](//github.com/froq/froq-database/blob/master/src/trait/RepositoryTrait.php)), they make possible to use entities for these purposes.
+Additionally, all repositories provide a proxy interface for some CRUD & query methods of `froq\database\entity\EntityManager` class via `froq\database\trait\RepositoryTrait::__call()` method ([source](//github.com/froq/froq-database/blob/master/src/trait/RepositoryTrait.php)), and they make possible to use entities for these purposes.
 
-Here we'll see some basic examples of using repositories, but not go to details since [database](/docs/database) and [entities](/docs/database-entities) are explained there.
+Here we'll see some basic examples of using repositories, but not go into details since [database](/docs/database) and [entities](/docs/database-entities) are explained there.
 
 ```php
 // File: app/repository/BookRepository.php
@@ -77,7 +77,7 @@ class BookController extends Controller {
 ```
 
 ### Using entities
-Since all repositories come with some query and CRUD methods, it's possible to use them directly with entities without creating and user-declared methods in your repositories.
+Since all repositories come with some CRUD & query methods, it's possible to use them directly with entities without creating any (specifically declared) methods in your repositories.
 
 ```php
 // File: app/entity/Book.php
@@ -97,7 +97,7 @@ class Book extends \froq\database\entity\Entity {
     #[meta(field: 'price')]
     public $price;
 
-    // For save() calls.
+    // For save() calls only.
     public function validations() {
         return [
             'id'    => ['type' => 'int'],
@@ -113,7 +113,9 @@ class Book extends \froq\database\entity\Entity {
 // File: app/entity/BookList.php
 namespace app\entity;
 
-class BookList extends \froq\database\entity\EntityList {}
+class BookList extends \froq\database\entity\EntityList {
+    // Inherits some count, check & iteration methods.
+}
 ```
 
 ```php
@@ -148,7 +150,7 @@ class BookController extends \froq\app\Controller {
             $error['details'] = 'Internal server error';
         }
 
-        return $this->response->json($status, ['book' => $book, 'error' => $error]);
+        $this->response->json($status, ['data' => ['book' => $book], 'error' => $error]);
     }
 
     /** @call PUT /book/:id */
@@ -173,7 +175,7 @@ class BookController extends \froq\app\Controller {
             $error['details'] = 'Internal server error';
         }
 
-        return $this->response->json($status, ['book' => $book, 'error' => $error]);
+        $this->response->json($status, ['data' => ['book' => $book], 'error' => $error]);
     }
 
     /** @call DELETE /book/:id */
@@ -182,7 +184,7 @@ class BookController extends \froq\app\Controller {
         $book = $this->repository->remove(new Book(id: $id));
         $status = $book->isRemoved() ? Status::OK : Status::NOT_FOUND;
 
-        return $this->response->json($status, ['book' => $book]);
+        $this->response->json($status, ['data' => ['book' => $book]]);
     }
 
     /** @call GET /book/:id */
@@ -191,7 +193,7 @@ class BookController extends \froq\app\Controller {
         $book = $this->repository->find(new Book(id: $id));
         $status = $book->isFound() ? Status::OK : Status::NOT_FOUND;
 
-        return $this->response->json($status, ['book' => $book]);
+        $this->response->json($status, ['data' => ['book' => $book]]);
     }
 
     /** @call GET /book */
@@ -200,7 +202,7 @@ class BookController extends \froq\app\Controller {
         $books = $this->repository->findBy(Book::class, ...$this->getLimitOffset());
         $status = $books->isNotEmpty() ? Status::OK : Status::NOT_FOUND;
 
-        return $this->response->json($status, ['books' => $books->toArray()]);
+        $this->response->json($status, ['data' => ['books' => $books->toArray()]]);
     }
 
     /** @call GET /book/search */
@@ -219,14 +221,15 @@ class BookController extends \froq\app\Controller {
         $books = $this->repository->findBy(Book::class, $qb, ...$this->getLimitOffset());
         $status = $books->isNotEmpty() ? Status::OK : Status::NOT_FOUND;
 
-        return $this->response->json($status, ['books' => $books->toArray()]);
+        $this->response->json($status, ['data' => ['books' => $books->toArray()]]);
     }
 
     private function getLimitOffset() {
         $limit = (int) $this->getParam('limit', 10);
         $offset = $limit * ((int) $this->getParam('page'));
 
-        if ($limit > 100) $limit = 100;
+        // Maybe..
+        // if ($limit > 100) $limit = 100;
 
         // As named arguments (limit: .., offset: ..).
         return ['limit' => $limit, 'offset' => $offset];
