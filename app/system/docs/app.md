@@ -101,7 +101,7 @@ public function uploadAction() {
     $allowedMimeTypes = $this->app->config('allowedMimeTypes');
     $uploadedFileMimeType = /* Resolved or received MIME type. */;
 
-    if (!array_contains($uploadedFileMimeType, ...$allowedMimeTypes)) {
+    if (!array_contains($allowedMimeTypes, $uploadedFileMimeType)) {
         throw new UnsupportedMediaTypeException(); /* froq\http\exception\client */
         // throw new HttpException(code: 415);     /* Alternative: froq\http */
         // throw $this->createHttpException(415);  /* Alternative: froq\app\Controller. */
