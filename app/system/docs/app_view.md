@@ -10,7 +10,7 @@ To use this feature, `view` options in config file must be provided and in each 
 
 <br class="sep">
 
-*Note: To echo the rendered content into layout file can only be done `$CONTENT` variable, and this variable name must not be used when sending data to the view file calling `$this->view()` or $this->view->setData() methods.*
+*Note: To echo the rendered content into layout file can only be done `$CONTENT` variable, and this variable name must not be used when sending data to the view file calling `$this->view()` or `$this->view->setData()` methods.*
 
 As an example, this site's view config is like;
 
@@ -64,24 +64,23 @@ class UserController extends Controller {
 
             if ($loginIsNotOkay) {
                 // Set login error.
-                $this->flash('login_failed', true);
+                $this->flash('loginFailed', true);
 
                 return $this->redirect('/login');
             }
         }
 
         // Get login error (if exists).
-        $loginFailed = $this->flash('login_failed');
-        $status = $loginFailed ? Status::FORBIDDEN : Status::OK;
+        $loginFailed = $this->flash('loginFailed');
 
-        return $this->view('login', ['login_failed' => $loginFailed], $status);
+        return $this->view('login', ['loginFailed' => $loginFailed]);
     }
 }
 ```
 
 ```php
 <!-- File: app/system/view/login.php -->
-<?php if ($login_failed): ?>
+<?php if ($loginFailed): ?>
     <div class="error">Invalid login.</div>
 <?php endif ?>
 ```
