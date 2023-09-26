@@ -81,7 +81,7 @@ Application's cache is a global approach to caching operations and these operati
 $this->app->cache(key, value, ?ttl);
 
 // Get a cache item.
-$this->app->cache(key);
+value = $this->app->cache(key);
 
 // Delete a cache item or all items.
 $this->app->uncache(key);
@@ -103,8 +103,8 @@ public function uploadAction() {
 
     if (!array_contains($uploadedFileMimeType, ...$allowedMimeTypes)) {
         throw new UnsupportedMediaTypeException(); /* froq\http\exception\client */
-        // throw new HttpException(code: 415);        /* Alternative: froq\http */
-        // throw new $this->createHttpException(415); /* Alternative: froq\app\Controller. */
+        // throw new HttpException(code: 415);     /* Alternative: froq\http */
+        // throw $this->createHttpException(415);  /* Alternative: froq\app\Controller. */
     }
 }
 ```
@@ -117,7 +117,7 @@ General logging operations can be done with `App::log()` method (uses `$app->log
 public function loginAction() {
     [$username, $password] = $this->postParams(['username', 'password']);
 
-    // Login helper is just an example.
+    // Login helper (just an example).
     if (!Login::execute($username, $password)) {
         $this->app->log(format(
             'Failed login attemp, username: %s, password: %s, ip: %s',
@@ -127,9 +127,9 @@ public function loginAction() {
         // Or directly.
         // $this->app->logger->logInfo('Failed login attepmt, ...');
 
-        throw new UnauthorizedException(); /* froq\http\exception\client */
-        // throw new HttpException(code: 401);        /* Alternative: froq\http */
-        // throw new $this->createHttpException(401); /* Alternative: froq\app\Controller. */
+        throw new UnauthorizedException();        /* froq\http\exception\client */
+        // throw new HttpException(code: 401);    /* Alternative: froq\http */
+        // throw $this->createHttpException(401); /* Alternative: froq\app\Controller. */
     }
 }
 ```
