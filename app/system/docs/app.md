@@ -120,12 +120,12 @@ public function loginAction() {
     // Login helper (just an example).
     if (!Login::execute($username, $password)) {
         $this->app->log(format(
-            'Failed login attemp, username: %s, password: %s, ip: %s',
+            'Failed login attempt, username: %s, password: %s, ip: %s',
             $username, $password, $this->request->client->getIp()
         ));
 
         // Or directly.
-        // $this->app->logger->logInfo('Failed login attepmt, ...');
+        // $this->app->logger->logInfo('Failed login attempt, ...');
 
         throw new UnauthorizedException();        /* froq\http\exception\client */
         // throw new HttpException(code: 401);    /* Alternative: froq\http */
