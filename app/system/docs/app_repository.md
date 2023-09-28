@@ -114,7 +114,7 @@ class Book extends \froq\database\entity\Entity {
 namespace app\entity;
 
 class BookList extends \froq\database\entity\EntityList {
-    // Inherits count, check & iteration methods.
+    // Inherits count, check, iteration, convertion methods.
 }
 ```
 
