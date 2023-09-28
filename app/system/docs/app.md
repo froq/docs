@@ -34,7 +34,6 @@ public function fooAction() {
 ```
 
 ### Optional properties `Session`, `Database`, `Cache`
-
 These properties will only be created automatically by given configuration options in `app/config/config.php` file and accessible from all over the controllers (e.g. `$this->app->session`).
 
 ```php
@@ -89,7 +88,6 @@ $this->app->uncache('*');
 ```
 
 ### Config operations
-
 Froq! makes all the (app) configuration options as read-only, meaning that, all options can be set only via `app/config/config.php` file but are accessible all over the application instance.
 
 ```php
@@ -110,7 +108,6 @@ public function uploadAction() {
 ```
 
 ### Logging operations
-
 General logging operations can be done with `App::log()` method (uses `$app->logger`) or with `$app->logger` property directly. If any other specific logger is required, `froq\log\Logger` can be used in case.
 
 ```php
@@ -135,7 +132,6 @@ public function loginAction() {
 ```
 
 ### Registering & using services
-
 While services can be registered via `app/confing/services.php` file, that also can be done `App::service()` method. But the thing is, if you don't use a main controller (e.g. `AppController` extended by all other related controllers), it's useless and you'd better use the services file only. Otherwise, we're going with `AppController` example here, but also going to see getting / using registered services.
 
 ```php
