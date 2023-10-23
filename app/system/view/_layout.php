@@ -64,7 +64,7 @@
 <script src="/asset/prism.js"></script>
 
 <script>
-froq.ready(() => {
+app.ready(() => {
     const getText = el => el.textContent.trim();
     const slugName = name => name.replace(/[^\w]/g, " ").trim()
                                  .replace(/\s+/g, "-").toLowerCase();
@@ -73,13 +73,13 @@ froq.ready(() => {
     setTimeout(() => {
         if (location.hash) {
             let href = slugName(location.hash);
-            let anch = froq.find(`[name="${href}"]`);
+            let anch = app.find(`[name="${href}"]`);
             anch && window.scrollTo({top: anch.offsetTop - 5});
         }
     }, 1000);
 
     // Header anchors.
-    froq.findAll(".docs > h2, .docs > h3, .docs > h4").forEach(el => {
+    app.findAll(".docs > h2, .docs > h3, .docs > h4").forEach(el => {
         let a = document.createElement("a");
         a.name = slugName(getText(el));
         a.href = "#" + a.name;
@@ -88,7 +88,7 @@ froq.ready(() => {
     });
 
     // Outer links.
-    froq.findAll("a[href]").forEach(el => {
+    app.findAll("a[href]").forEach(el => {
         if (el.hostname !== location.hostname) {
             el.setAttribute("target", "_blank");
         }
@@ -101,7 +101,7 @@ froq.ready(() => {
     });
 
     // Prism (add method class).
-    froq.findAll(".token.function").forEach(el => {
+    app.findAll(".token.function").forEach(el => {
         // fn() => ..
         if (el.textContent === "fn" && el.nextSibling.textContent === "(") {
             el.classList.replace("function", "keyword");
@@ -142,7 +142,7 @@ froq.ready(() => {
     };
 
     // Prism (fix class & namespace names).
-    froq.findAll(".token.class-name, .token.scope, .token.package").forEach(el => {
+    app.findAll(".token.class-name, .token.scope, .token.package").forEach(el => {
         let txt = getText(el);
         let prev, next;
 
@@ -218,7 +218,7 @@ froq.ready(() => {
     });
 
     // Prism (add arg type).
-    froq.findAll(".token.function").forEach(el => {
+    app.findAll(".token.function").forEach(el => {
         let nodes = [], next = el.nextSibling;
 
         if (next.textContent === "(") {
@@ -242,7 +242,7 @@ froq.ready(() => {
 
 
     // Prism (fix array/null keywords).
-    froq.findAll(".token.keyword").forEach(el => {
+    app.findAll(".token.keyword").forEach(el => {
         let txt = getText(el);
         switch (true) {
             case (txt === "array"):
@@ -262,14 +262,14 @@ froq.ready(() => {
     });
 
     // Prism (remove # comments).
-    froq.findAll(".language-php > .comment").forEach(el => {
+    app.findAll(".language-php > .comment").forEach(el => {
         if (el.textContent.startsWith("#")) {
             el.classList.replace("comment", "comment--");
         }
     });
 
     // Prism (bash comments).
-    froq.findAll("code.language-bash").forEach(el => {
+    app.findAll("code.language-bash").forEach(el => {
         if (el.textContent.includes("# ")) {
             let lines = [];
 
@@ -285,7 +285,7 @@ froq.ready(() => {
     });
 
     // Main container height.
-    // froq.find(".main").style.minHeight = froq.find(".side").scrollHeight + "px";
+    // app.find(".main").style.minHeight = app.find(".side").scrollHeight + "px";
 })
 </script>
 

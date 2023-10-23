@@ -1,15 +1,15 @@
 !function (win) {
 
-var froq = {};
+const app = {};
 
-var readyCallbacks = [];
-var readyCallbacksFire = function () {
+const readyCallbacks = [];
+const readyCallbacksFire = function () {
     while (readyCallbacks.length) {
         readyCallbacks.shift()();
     }
 };
 
-froq.ready = function (callback) {
+app.ready = function (callback) {
     if (callback) {
         readyCallbacks.push(callback);
     }
@@ -20,14 +20,14 @@ froq.ready = function (callback) {
     }, false);
 };
 
-froq.find = function (selector, root) {
+app.find = function (selector, root) {
     return (root || win.document).querySelector(selector);
 };
-froq.findAll = function (selector, root) {
+app.findAll = function (selector, root) {
     return (root || win.document).querySelectorAll(selector);
 };
 
-win.froq = froq;
+win.app = app;
 win.log = function () {
     console.log.apply(win.console, arguments);
 };
