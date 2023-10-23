@@ -24,7 +24,7 @@ git clone git@github.com:froq/sample.git . && composer install
 Route      : /post (for api.foo.com/post requests)
 Controller : app\controller\PostController => app/system/Post/PostController.php
 Repository : app\repository\PostRepository => app/system/Post/PostRepository.php
-                                           or app/system/Post/data/FooRepository.php
+                                           or app/system/Post/data/PostRepository.php
 Library    : app\library\PostHelper        => app/library/PostHelper.php
 ```
 
