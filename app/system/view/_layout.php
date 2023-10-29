@@ -87,13 +87,15 @@ app.ready(() => {
         el.appendChild(a);
     });
 
-    // Outer links.
+    // Links.
     app.findAll("a[href]").forEach(el => {
+        // External links.
         if (el.hostname !== location.hostname) {
             el.setAttribute("target", "_blank");
         }
 
-        if (getText(el) === 'THE_SOURCE_CODE') {
+        // GitHub source links.
+        if (getText(el) === '#git') {
             el.title = "Source Code on GitHub";
             el.innerHTML = "[<s>GitHub</s>]";
             el.style.visibility = "visible";

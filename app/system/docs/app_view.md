@@ -1,4 +1,4 @@
-# View [THE_SOURCE_CODE](//github.com/froq/froq/blob/master/src/app/View.php)
+# View [#git](//github.com/froq/froq/blob/master/src/app/View.php)
 
 Since the PHP language is already capable of working as a template engine itself and contains useful keywords (such as `if/endif`, `for/endfor` etc.) just like template engines use, Froq! doesn't bring or use any _exotic_ template stuff (like _blade_, _sharp_, _lord of the templates_ etc.) that makes these template files simply complicated, but provides a dead-simple view interface for rendering PHP files to HTML outputs.
 

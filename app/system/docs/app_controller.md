@@ -1,4 +1,4 @@
-# Controller [THE_SOURCE_CODE](//github.com/froq/froq/blob/master/src/app/Controller.php)
+# Controller [#git](//github.com/froq/froq/blob/master/src/app/Controller.php)
 
 All controllers must extends `froq\app\Controller` class that comes with many (frankly, tons of) handy *final* methods and some *readonly* properties.
 

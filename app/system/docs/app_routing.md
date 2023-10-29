@@ -1,4 +1,4 @@
-# Router [THE_SOURCE_CODE](//github.com/froq/froq/blob/master/src/Router.php)
+# Router [#git](//github.com/froq/froq/blob/master/src/Router.php)
 
 Froq! applies a simple yet fast routing way to resolve routes and call related / appropriate methods or callables (for micro), and beside, assembles all route definitions into one PHP file named `app/config/routes.php` as default.
 

@@ -1,4 +1,4 @@
-# Repository [THE_SOURCE_CODE](//github.com/froq/froq/blob/master/src/app/Repository.php)
+# Repository [#git](//github.com/froq/froq/blob/master/src/app/Repository.php)
 
 All repositories must extend `froq\app\Repository` class that comes some handy *final* methods and *protected* properties.
 

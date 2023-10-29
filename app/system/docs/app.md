@@ -1,4 +1,4 @@
-# Application [THE_SOURCE_CODE](//github.com/froq/froq/blob/master/src/App.php)
+# Application [#git](//github.com/froq/froq/blob/master/src/App.php)
 
 Application (as a class `froq\App` and internally a global variable `$app`) is the base where all application logic is being run and managed, and comes with lots of handy / ready-to-use properties and methods. Here we'll see all properties & methods step by step examples.
 
