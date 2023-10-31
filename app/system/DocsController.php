@@ -53,7 +53,7 @@ class DocsController extends AppController {
             $upath = chop($this->request->getPath(), '/');
 
             // Skip index page.
-            if (!hash_equals($upath, '/docs')) {
+            if ($upath !== '/docs') {
                 // Append title extracting it from first line (eg: # Application ..).
                 $title .= ' | ' . trim(grep('~# +([^\[]+)~', (string) $file->readLine()));
             }
