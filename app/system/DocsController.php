@@ -44,9 +44,9 @@ class DocsController extends AppController {
             ->slug(preserve: '_')
         ;
 
-        $file = new File(format('./app/system/docs/%s.md', $name));
+        $file = new File(format('%s/app/system/docs/%s.md', APP_DIR, $name));
 
-        if ($file->exists()) {
+        if ($file->okay()) {
             $file->open();
 
             $title = self::TITLE;
