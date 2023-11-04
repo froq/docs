@@ -211,10 +211,9 @@ class BookController extends \froq\app\Controller {
 
         /** @var UrlQuery|null (sugar) */
         if ($q = $this->request->query()) {
-
             $q->has('isbn') && $qb->in('isbn', $q->get('isbn'));
             $q->has('price') && $qb->between('price', $q->get('price'));
-            // ...
+            ...
         }
 
         /** @var BookList<Book> */
@@ -227,6 +226,70 @@ class BookController extends \froq\app\Controller {
     private function getLimitOffset() {
         $limit = (int) $this->getParam('limit', 10);
         $offset = $limit * ((int) $this->getParam('page'));
+
+        // Maybe..
+        // if ($limit > 100) $limit = 100;
+
+        // As named arguments (limit: .., offset: ..).
+        return ['limit' => $limit, 'offset' => $offset];
+    }
+}
+```
+
+<br class="sep">
+
+*Note: Looking at the (verbose) examples on this page, in case to keep controllers / actions concise, services can be used for this purpose. For example, `searchAction()` can be written like;*
+
+```php
+use app\service\BookService;
+...
+
+class BookController extends \froq\app\Controller {
+    ...
+
+    /** @call GET /book/search */
+    public function searchAction() {
+        $service = new BookService($this);
+        [$status, $books] = $service->search();
+
+        $this->response->json($status, ['data' => ['books' => $books->toArray()]]);
+    }
+}
+```
+
+```php
+// File: app/service/BookService.php
+namespace app\service;
+
+use app\entity\{Book, BookList};
+use froq\http\response\Status;
+use froq\app\Controller;
+
+class BookService {
+    public function __construct(
+        private Controller $controller
+    ) {}
+
+    public function searchAction(): array {
+        $qb = $this->controller->repository->initQuery();
+
+        /** @var UrlQuery|null (sugar) */
+        if ($q = $this->controller->request->query()) {
+            $q->has('isbn') && $qb->in('isbn', $q->get('isbn'));
+            $q->has('price') && $qb->between('price', $q->get('price'));
+            // ...
+        }
+
+        /** @var BookList<Book> */
+        $books = $this->controller->repository->findBy(Book::class, $qb, ...$this->getLimitOffset());
+        $status = $books->isNotEmpty() ? Status::OK : Status::NOT_FOUND;
+
+        return [$status, $books];
+    }
+
+    private function getLimitOffset(): array {
+        $limit = (int) $this->controller->getParam('limit', 10);
+        $offset = $limit * ((int) $this->controller->getParam('page'));
 
         // Maybe..
         // if ($limit > 100) $limit = 100;
