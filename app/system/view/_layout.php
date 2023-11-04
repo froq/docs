@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="<?= page_description() ?>">
 
+    <link rel="shortcut icon" href="https://avatars.githubusercontent.com/u/16494734?s=200&v=4">
     <link href="/asset/app.css" rel="preload">
     <link href="/asset/prism.css" rel="preload">
 </head>
