@@ -5,6 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="<?= page_description() ?>">
+
+    <link href="/asset/app.css" rel="preload">
+    <link href="/asset/prism.css" rel="preload">
 </head>
 <body>
 
@@ -58,8 +61,8 @@
     Froq! Framework · <a href="/">Home</a> · <a href="/docs">Docs</a> · <a href="//github.com/froq">GitHub</a>
 </div>
 
-<link rel="stylesheet" href="/asset/app.css">
-<link rel="stylesheet" href="/asset/prism.css">
+<link href="/asset/app.css" rel="stylesheet">
+<link href="/asset/prism.css" rel="stylesheet">
 <script src="/asset/app.js"></script>
 <script src="/asset/prism.js"></script>
 
