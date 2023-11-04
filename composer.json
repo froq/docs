@@ -7,6 +7,7 @@
     "authors": [{"name": "Kerem Güneş"}],
     "require": {
         "php": "^8.2",
+        "froq/froq": "^7.0",
         "erusev/parsedown": "^1.7"
     },
     "autoload": {
