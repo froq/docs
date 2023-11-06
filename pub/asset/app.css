@@ -57,7 +57,7 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; margin-bottom: 6px; }
     /*.token.property {color: inherit !important}*/
 
 /*** mobile ***/
-@media (max-width: 767px) {
+@media (min-width: 320px) {
     .head { font-size: 18px; }
     .body .side { width: 23% }
     .body .main { width: 75%; word-break: break-word; }
