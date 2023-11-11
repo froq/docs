@@ -1,7 +1,7 @@
 <div class="home">
     <h2>Welcome</h2>
 
-    <p>Froq! is a PHP framework that helps you quickly write simple yet powerful web applications and APIs with a minimal installation / configuration process. It basically accepts HTTP requests, applies some method / callback routines, and returns HTTP responses.</p>
+    <p>Froq! is a PHP framework that helps you quickly create simple yet powerful web applications and APIs with a minimal installation / configuration process. It basically accepts HTTP requests, applies some method / callback routines, and returns HTTP responses.</p>
 
     <p>Froq! neither follows MVC architecture rules nor contains a Model component, but instead, it makes use of Controller, Repository and View components.</p>
 
