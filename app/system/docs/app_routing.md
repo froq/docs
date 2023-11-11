@@ -53,8 +53,15 @@ public function showAction($id, $slug = null) { ... }
 ```php
 // For PostController::showAction().
 '/post/:id' => ['GET' => 'Post.show'],
+// For PostController::removeAction().
 '/post/:id' => ['DELETE' => 'Post.remove'],
+// For PostController::updateAction().
 '/post/:id' => ['PUT,PATCH' => 'Post.update'],
+
+// Or all-in-one directive.
+'/post/:id' => ['GET' => 'Book.show',
+                'DELETE' => 'Post.remove',
+                'PUT,PATCH' => 'Book.update'],
 
 // Or catch all methods.
 '/post' => 'Post',
