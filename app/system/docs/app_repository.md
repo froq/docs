@@ -16,22 +16,24 @@ use froq\app\Repository;
 use froq\database\query\QueryParams;
 
 class BookRepository extends Repository {
+    /** @return array|null */
     public function find(int $id): ?array {
-        return $this->initQuery()
-                    ->select('*')
-                    ->from('books')
-                    ->where('id', [$id])
-                    ->get();
+        /** @var froq\database\Query */
+        return $this->initQuery('books')
+            ->select()
+            ->where('id', [$id])
+            ->get();
     }
 
+    /** @return array<array>|null */
     public function findAll(QueryParams $qp, ?int $page = null, int $limit = 10): ?array {
-        return $this->initQuery()
-                    ->select('*')
-                    ->from('books')
-                    ->where($qp)
-                    ->order('id', -1)
-                    ->paginate($page, $limit)
-                    ->getAll();
+        /** @var froq\database\Query */
+        return $this->initQuery('books')
+            ->select()
+            ->where($qp)
+            ->order('id', 'DESC')
+            ->paginate($page, $limit)
+            ->getAll();
     }
 }
 ```
@@ -52,10 +54,11 @@ class BookController extends Controller {
         $book = $this->repository->find($id);
         $status = $book ? Status::OK : Status::NOT_FOUND;
 
-        return $this->view('show', data: ['book' => $book], status: $status);
+        return $this->view('show', ['book' => $book], $status);
     }
 
     public function searchAction() {
+        /** @var froq\database\query\QueryParams */
         $qp = $this->repository->initQueryParams();
 
         /** @var UrlQuery|null (sugar) */
@@ -71,7 +74,7 @@ class BookController extends Controller {
         $books = $this->repository->findAll($qp, $page ?? null);
         $status = $books ? Status::OK : Status::NOT_FOUND;
 
-        return $this->view('search', data: ['books' => $books], status: $status);
+        return $this->view('search', ['books' => $books], $status);
     }
 }
 ```
@@ -98,7 +101,7 @@ class Book extends \froq\database\entity\Entity {
     public $price;
 
     // For save() calls only.
-    public function validations() {
+    public function validations(): array {
         return [
             'id'    => ['type' => 'int'],
             'name'  => ['type' => 'string', 'required'],
@@ -114,7 +117,7 @@ class Book extends \froq\database\entity\Entity {
 namespace app\entity;
 
 class BookList extends \froq\database\entity\EntityList {
-    // Inherits count, check, iteration, conversion methods.
+    // Inherits count, check, iteration & util methods.
 }
 ```
 
@@ -165,7 +168,7 @@ class BookController extends \froq\app\Controller {
                 // "..." will call Entity.fill() method to set properties.
                 ...$this->request->post(['name', 'isbn', 'price'], combine: true)
             ));
-            // If no such book found, isSaved() = false.
+            // If no such book exists, isSaved() = false.
             $status = $book->isSaved() ? Status::ACCEPTED : Status::NOT_FOUND;
         } catch (ValidationError $e) {
             $status = Status::BAD_REQUEST;
@@ -207,6 +210,7 @@ class BookController extends \froq\app\Controller {
 
     /** @call GET /book/search */
     public function searchAction() {
+        /** @var froq\database\Query */
         $qb = $this->repository->initQuery();
 
         /** @var UrlQuery|null (sugar) */
@@ -271,6 +275,7 @@ class BookService {
     ) {}
 
     public function searchAction(): array {
+        /** @var froq\database\Query */
         $qb = $this->controller->repository->initQuery();
 
         /** @var UrlQuery|null (sugar) */
