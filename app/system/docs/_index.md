@@ -18,13 +18,24 @@ git clone git@github.com:froq/sample.git . && composer install
 
 <br class="sep">
 
-*Note: To manipulate autoloader, change `autoload.psr-4` field in `composer.json` file. Otherwise, all the autoload operations will be operated like the example below as default by `froq\Autoloader` class ([source](//github.com/froq/froq/blob/master/src/Autoloader.php)).*
+*Note: To manipulate autoloader, change `autoload.psr-4` field in `composer.json` file. Otherwise, with a secondary look-up (as those "or" below indicate), all the autoload operations will be handled like in the example below as default by `froq\Autoloader` class (see `getFile()` source [here](//github.com/froq/froq/blob/master/src/Autoloader.php#L349)), yet depending on their namespaces that start with these three: `app\controller`, `app\repository`, `app\library`.*
 
 ```none
-Route      : /post (for api.foo.com/post requests)
+Route      : /post (e.g: "api.foo.com/post" requests)
+
+# Controllers.
 Controller : app\controller\PostController => app/system/Post/PostController.php
+
+# Repository & other data-related things.
 Repository : app\repository\PostRepository => app/system/Post/PostRepository.php
                                            or app/system/Post/data/PostRepository.php
+Entity     : app\repository\PostEntity     => app/system/Post/PostEntity.php
+                                           or app/system/Post/data/PostEntity.php
+EntityList : app\repository\PostEntityList => app/system/Post/PostEntityList.php
+                                           or app/system/Post/data/PostEntityList.php
+Query      : app\repository\PostQuery      => app/system/Post/PostQuery.php
+                                           or app/system/Post/data/PostQuery.php
+# Library items.
 Library    : app\library\PostHelper        => app/library/PostHelper.php
 ```
 
