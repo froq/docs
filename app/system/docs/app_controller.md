@@ -266,8 +266,7 @@ class ApiController extends Controller {
     }
 
     // Payload procedure.
-    public final function send(int $status, array $data = null, array $error = null): JsonPayload
-    {
+    public final function send(int $status, array $data = null, array $error = null): JsonPayload {
         return new JsonPayload($status, content: [
             'status' => $status, 'data' => $data, 'error' => $error
         ]);
@@ -448,18 +447,18 @@ $controller->segmentParams(['show'], defaults: []|null);
 ```
 
 ### Request & Response
-Froq! aims to provide a smooth HTTP interaction to its users (developers) so that they can enjoy while they're conding their projects, and to realise that it brings two components named as `froq\http\Request`, `froq\http\Response` and equipped with many useful properties / methods. You can find more details about [Request](/docs/http-request) and [Response](/docs/http-response) documents.
+Froq! aims to provide a smooth HTTP interaction to its users (developers) so they can enjoy while they're coding their projects, and to realise that, it brings two components named as `froq\http\Request`, `froq\http\Response` and equipped with many useful properties / methods. You can find more details about [Request](/docs/http-request) and [Response](/docs/http-response) documents.
 
 #### Injecting `Request` & `Response` objects
-It's easy to inject these objects into an action in-place and on-demand by declaring these actions with the arguments that typed as `froq\http\Request` and/or `froq\http\Response` types. While these arguments will automatically be passed to the action (that's being called), the other arguments will also be passed to this action (regardless of their place / order).
+It's easy to inject these objects into an action in-place and on-demand by declaring these actions with the arguments that typed as `froq\http\Request` and/or `froq\http\Response`. While these arguments will automatically be passed to the action (that being called), the other arguments will also be passed to that action (regardless of their place / order).
 
-Although you can inject these objects into any action, they are just references of `$controller->request` and `$controller->response` properties and instead of injecting them, you can also use they just like `$this->request` or `$this->response`.
+Although you can inject these objects into any action, they're just references of `$request` and `$response` properties of controllers and instead of injecting them, you can also use them just like `$this->request` or `$this->response` in controllers.
 
 ```php
 use froq\http\{Request, Response};
 // ...
 
-// With path params.
+// With path params (e.g: GET /some/:id).
 public function someAction(int $id, Request $request, Response $response) {
     $content = [
         'id' => $id,
@@ -467,17 +466,18 @@ public function someAction(int $id, Request $request, Response $response) {
         'request_utime' => $request->utime,
     ];
 
-    $response->json(Status::OK, $content, /* headers: array, cookies: array */);
+    $response->json(Status::OK, $content, /* headers: [], cookies: [] */);
 }
 
-// Without path params.
+// Without path params (e.g: GET /some).
 public function someAction(Request $request, Response $response) {
     $content = [
+        'id' => (int) $request->get('id'),
         'request_time' => $request->time,
         'request_utime' => $request->utime,
     ];
 
-    $response->json(Status::OK, $content, /* headers: array, cookies: array */);
+    $response->json(Status::OK, $content, /* headers: [], cookies: [] */);
 }
 ```
 
