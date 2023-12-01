@@ -161,3 +161,100 @@ public function saveAction() {
 }
 ```
 
+### Route (micro) methods
+The `froq\App` class comes with some micro methods to provide these `GET`, `POST`, `PUT`, `DELETE` route definitions easy-in-short without using `app/config/routes.php` file, and this methods must be called in `pub/index.php` file inside of `prepare()` part. For other any specific HTTP-method related (e.g: `PATCH`) routes can be defined via `route()` method.
+
+*Note: Every given callable is binded to `froq\app\Controller` class, meaning that, `$this` variable is available as an instance of this class inside of these callables.* <br>
+*Note: Not everytime a closure callable is needed for a callback routine, meaning that, you can still declare controller classes and given their actions as callables.*
+
+**Simple example**
+```php
+// A route with controller action.
+$app->get('/book/:id', 'Book.show');
+
+// A route with closure callable.
+$app->get('/book/:id', function ($id) { ... });
+
+// Another HTTP-method route.
+$app->route('/book/:id', 'PATCH', function ($id) { ... });
+```
+
+**Detailed example**
+```php
+// File: pub/index.php
+use froq\http\response\Status;
+
+// Up to you.
+use app\entity\Book;
+use app\service\BookService;
+
+...
+->prepare(function ($app) {
+    ...
+    BookService::setApp($app);
+
+    // Send a Book.
+    $app->get('/book/:id', function (int $id): void {
+        /** @var Book|null */
+        $book = BookService::findBook($id);
+
+        $this->response->json(
+            $book?->isFound() ? Status::OK : Status::NOT_FOUND,
+            ['data' => ['book' => $book], 'error' => null]
+        );
+    });
+
+    // Create a Book.
+    $app->post('/book', function (): void {
+        /** @var array */
+        $data = $this->request->json();
+
+        /** @var Book|null */
+        $book = BookService::saveBook($data, $error);
+
+        $this->response->json(
+            $book?->isSaved() ? Status::CREATED : Status::INTERNAL_ERROR,
+            ['data' => ['book' => $book], 'error' => $error]
+        );
+    });
+
+    // Update a Book.
+    $app->put('/book/:id', function (int $id): void {
+        /** @var array */
+        $data = $this->request->json();
+        $data['id'] = $id;
+
+        /** @var Book|null */
+        $book = BookService::saveBook($data, $error);
+
+        $this->response->json(
+            $book?->isSaved() ? Status::ACCEPTED : Status::INTERNAL_ERROR,
+            ['data' => ['book' => $book], 'error' => $error]
+        );
+    });
+
+    // Delete a Book.
+    $app->delete('/book/:id', function (int $id): void {
+        /** @var Book|null */
+        $book = BookService::removeBook($id);
+
+        $this->response->json(
+            $book?->isRemoved() ? Status::OK : Status::NOT_FOUND,
+            ['data' => ['book' => $book], 'error' => null]
+        );
+    });
+})
+```
+
+*Note: If you don't want to push all these rotuing stuff into `pub/index.php` file, you can separate each related routing file and include them into index file.*
+
+```php
+...
+->prepare(function ($app) {
+    ...
+
+    // Shortcut routes.
+    include 'book.php';
+    include 'book_author.php';
+})
+```
