@@ -469,7 +469,7 @@ public function someAction(int $id, Request $request, Response $response) {
     $response->json(Status::OK, $content, /* headers: [], cookies: [] */);
 }
 
-// Without path params (e.g: GET /some).
+// Without path params (e.g: GET /some?id=123).
 public function someAction(Request $request, Response $response) {
     $content = [
         'id' => (int) $request->get('id'),
