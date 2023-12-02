@@ -627,7 +627,7 @@ public function someAction() {
     return $this->redirect(
         '/another-target?id=%d',
         [123],                  // For format('...?id=%d').
-        code: Status::FOUND,    // 3xx HTT code.
+        code: Status::FOUND,    // 3xx HTTP code.
         body: '...',            // Just in case.
         headers: ['k/v pairs'], // HTTP headers to send with direction.
         cookies: ['k/v pairs'], // HTTP cookies to send with direction.
