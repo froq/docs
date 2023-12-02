@@ -17,6 +17,7 @@
     <div class="navi">
         <a href="/">Home</a>
         <a href="/docs">Docs</a>
+        <a href="/api">API</a>
         <a href="//github.com/froq">GitHub</a>
     </div>
 </div>
@@ -27,6 +28,7 @@
     </div><!-- .main -->
 
     <div class="side">
+        <?php if (test_path('^/(docs/?.*)?$')): ?>
         <b>Getting Started</b>
         <a href="/docs#installation">Installation</a>
         <a href="/docs#configuration">Configuration</a>
@@ -55,11 +57,14 @@
         <a href="/docs/util-sugar-classes">Sugar Classes</a>
         <a href="/docs/util-sugar-functions">Sugar Functions</a>
         <a href="/docs/util-sugar-constants">Sugar Constants</a>
+        <?php elseif (test_path('^/api(/?.*)?')): ?>
+        <!-- @todo -->
+        <?php endif ?>
     </div>
 </div>
 
 <div class="foot wrap">
-    Froq! Framework · <a href="/">Home</a> · <a href="/docs">Docs</a> · <a href="//github.com/froq">GitHub</a>
+    Froq! Framework · <a href="/">Home</a> · <a href="/docs">Docs</a> · <a href="/api">API</a> · <a href="//github.com/froq">GitHub</a>
 </div>
 
 <link href="/asset/app.css" rel="stylesheet">
