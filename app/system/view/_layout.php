@@ -28,7 +28,7 @@
     </div><!-- .main -->
 
     <div class="side">
-        <?php if (test_path('^/(docs/?.*)?$')): ?>
+        <?php if (is_doc_path()): ?>
         <b>Getting Started</b>
         <a href="/docs#installation">Installation</a>
         <a href="/docs#configuration">Configuration</a>
@@ -57,7 +57,7 @@
         <a href="/docs/util-sugar-classes">Sugar Classes</a>
         <a href="/docs/util-sugar-functions">Sugar Functions</a>
         <a href="/docs/util-sugar-constants">Sugar Constants</a>
-        <?php elseif (test_path('^/api(/?.*)?')): ?>
+        <?php elseif (is_api_path()): ?>
         <!-- @todo -->
         <?php endif ?>
     </div>

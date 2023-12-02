@@ -25,3 +25,11 @@ function test_path(string ...$patterns): bool {
 
     return false;
 }
+
+function is_doc_path(): bool {
+    return test_path('^/$', '^/docs/?.*');
+}
+
+function is_api_path(): bool {
+    return test_path('^/api(/?.*)?');
+}
