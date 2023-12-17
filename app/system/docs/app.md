@@ -20,7 +20,7 @@ public function fooAction() {
 
 ```php
 public function fooAction() {
-    // Level is LogLevel::ALL as default (can be changed calling $logger->setLevel()).
+    // Level is LogLevel::ALL as default (can be changed via $logger->setLevel()).
     assert($this->app->logger instanceof \froq\log\Logger);
 
     // Global request / response objects.
@@ -34,7 +34,7 @@ public function fooAction() {
 ```
 
 ### Optional properties `Session`, `Database`, `Cache`
-These properties will only be created automatically by given configuration options in `app/config/config.php` file and accessible from all over the controllers (e.g. `$this->app->session`).
+These properties (`$session`, `$database` and `$cache`) will only be created automatically by given the configuration options in `app/config/config.php` file and accessible from all over the controllers (e.g. `$this->app->session`).
 
 ```php
 // Sample Session options (as default):
@@ -88,7 +88,7 @@ $this->app->uncache('*');
 ```
 
 ### Config operations
-Froq! makes all the (app) configuration options as read-only, meaning that, all options can be set only via `app/config/config.php` file but are accessible all over the application instance.
+Froq! keeps all the (app) configuration options read-only, meaning that, all options can only be set via `app/config/config.php` file but are accessible application-wide via `$app->config()` method.
 
 ```php
 // Set an option in config.php file.
@@ -108,7 +108,9 @@ public function uploadAction() {
 ```
 
 ### Logging operations
-General logging operations can be done with `App::log()` method (uses `$app->logger`) or with `$app->logger` property directly. If any other specific logger is required, `froq\log\Logger` can be used in case.
+General / arbitrary logging operations can be done with `$app->log()` method (uses `$app->logger` property, an instance of `froq\log\Logger`) or with `$app->logger` property directly. If any other specific logger is required, againg `froq\log\Logger` class or an external class can be used in case.
+
+*Note: While the default app's log level is `LogLevel::ALL`, it can also be changed in configuration file via `log.level` option or `$app->logger->setLevel()` method using `froq\log\LogLevel` (pseudo-enum) class constants ([source](//github.com/froq/froq-log/blob/master/src/LogLevel.php)).*
 
 ```php
 public function loginAction() {
@@ -132,7 +134,7 @@ public function loginAction() {
 ```
 
 ### Registering & using services
-While services can be registered via `app/confing/services.php` file, that also can be done `App::service()` method. But the thing is, if you don't use a main controller (e.g. `AppController` extended by all other related controllers), it's useless and you'd better use the services file only. Otherwise, we're going with `AppController` example here, but also going to see getting / using registered services.
+While services can be registered via `app/confing/services.php` file, that also can be done `$app->service()` method. But the thing is, if you don't use a main controller (e.g. `AppController` extended by all other related controllers), it's useless and you'd better use the services file only. Otherwise, we're going with `AppController` example here, but also going to see getting / using registered services.
 
 ```php
 // AppController

@@ -2,7 +2,7 @@
 html { scroll-behavior: smooth; }
 /*body { font: 14px / 20px arial; color: #444; }*/
 body { font: 400 90% / 150% 'helvetica neue', helvetica, arial, sans; color: #555; }
-pre, code { font-family: "Source Code Pro", "Consolas", monospace !important; /*background-color: #f6f6f6; border-radius: 4px;*/ }
+pre, code { font-family: "Source Code Pro", "Consolas", monospace !important; color: #333; /*background-color: #f6f6f6; border-radius: 4px;*/ }
 pre { padding: 9px; line-height: 155% !important; } code:not([class*="language-"]) { font-size: 95%; /*padding: 0 4px 2px;*/ }
 a { color: blue; text-decoration: none; }
 a:hover { text-decoration: underline; }
@@ -38,6 +38,9 @@ h1, h2, h3, h4, h5, h6 { font-weight: 500; margin-bottom: 6px; }
 
 /*.docs > h3 { margin-bottom: 10px; }*/
     /*.docs > h3:not(:first-child) { margin-top: 20px; }*/
+
+.docs em.note { font-style: normal; }
+    .docs em.note > b:first-child { font-weight: bold; }
 
 /*** prism @override ***/
 :not(pre) > code[class*="language-"], pre[class*="language-"] {background: #f6f6f6 !important; padding: 9px 12px !important; border: 1px solid #e9e9e9; border-radius: 4px}

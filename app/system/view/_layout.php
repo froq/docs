@@ -104,6 +104,8 @@ app.ready(() => {
         }
 
         // GitHub source links.
+        // @todo: Change [GitHub] => [API / Source] after completing SourceController,
+        // and Source pages must contain GitHub links.
         if (getText(el) === '#git') {
             el.title = "Source Code on GitHub";
             el.innerHTML = "[<s>GitHub</s>]";
@@ -292,6 +294,14 @@ app.ready(() => {
             });
 
             el.innerHTML = lines.join("\n");
+        }
+    });
+
+    // Note <em>'s.
+    app.findAll("em").forEach(el => {
+        if (el.textContent.substring(0, 5) === "Note:") {
+            el.innerHTML = "<b>Note:</b> " + el.innerHTML.substring(5).trim();
+            el.classList.add("note");
         }
     });
 
