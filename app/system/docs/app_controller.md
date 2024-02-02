@@ -4,12 +4,14 @@ All controllers must extends `froq\app\Controller` class that comes with many (f
 
 Probably the most important properties would be `$repository` (created by `$useRepository`), `$session` (created by `$useSession`) and `$view` (created by `$useView`).
 
-The other ones are `$app` (instance of `froq\App`), `$request` (instance of `froq\http\Request`, reference of `$app->request`), `$response` (instance of `froq\http\Response`, reference of `$app->response`).
+The other ones are `$app` (instance of `froq\App`), `$request` (instance of `froq\http\Request`, reference of `$app->request`), `$response` (instance of `froq\http\Response`, reference of `$app->response`) and `$state` (instance of `State`, a dynamic state object).
 
-*Note: All methods in `froq\app\Controller` are declared as `final`, including `__construct()` & `__destruct()` methods (so instead, `init()` / `dinit()` methods can be declared in subcontrollers for these two methods as substitutes.*
+*Note: All methods in `froq\app\Controller` are declared as `final`, excluding `__construct()` & `__destruct()` methods (so, to skip them, `init()` / `dinit()` methods can be declared in subcontrollers for these two methods as substitutes when needed.*
 
-### Optional `$use` properties
-As you can see, all these `$use` properties must be declared in the subcontroller class as `true` (all defaults are `false`) and both `$repository` & `$session` properties / operations are dependent on the related config options (see [here](/docs/app#optional-properties-session-database-cache)).
+*Note: All `__construct()` methods available for promoted parameters, and in these methods `parent::__construct()` calls can be skipped. Plus, all promoted parameters' types must be a valid / existing class name (primitive types and interfaces aren't supported).*
+
+### Optional `$use*` properties
+All these `$use*` properties must be declared in the subcontroller class as `true` (all defaults are `false`) and both `$repository` & `$session` properties and operations are dependent on the related config options (see [here](/docs/app#optional-properties-session-database-cache)).
 
 #### HTML site example
 ```php
@@ -87,6 +89,34 @@ class TokenController extends Controller {
         return $this->jsonPayload(Status::UNAUTHORIZED, [
             'error' => 'Invalid credentials.'
         ]);
+    }
+}
+```
+
+### Constructor property promotion
+Constructor parameters can be promoted as a controller's properties while declaring `__construct()` methods. In these methods, `parent::__construct()` call can be skipped).
+
+*Note: All promoted parameters' types must be a valid / existing class name, primitive types and interfaces aren't supported and service registry can be used for interface-based dependencies.*
+
+```php
+// File: app/system/TokenController.php
+namespace app\controller;
+
+use froq\app\Controller;
+use app\service\TokenService;
+
+class TokenController extends Controller {
+    public function __construct(
+        private TokenService $service
+    ) {}
+
+    public function tokenAction() {
+        [$username, $password] = $this->request->post(['username', 'password']);
+
+        // Do some service works here.
+        $user = $this->service->findUserByUsername($username);
+
+        // ...
     }
 }
 ```
