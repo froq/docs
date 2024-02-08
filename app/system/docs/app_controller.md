@@ -1,6 +1,6 @@
 # Controller [#git](//github.com/froq/froq/blob/master/src/app/Controller.php)
 
-All controllers must extends `froq\app\Controller` class that comes with many (frankly, tons of) handy *final* methods and some *readonly* properties.
+All controllers must extend `froq\app\Controller` class that comes with many (frankly, tons of) handy *final* methods and some *readonly* properties.
 
 Probably the most important properties would be `$repository` (created by `$useRepository`), `$session` (created by `$useSession`) and `$view` (created by `$useView`).
 
@@ -8,7 +8,7 @@ The other ones are `$app` (instance of `froq\App`), `$request` (instance of `fro
 
 *Note: All methods in `froq\app\Controller` are declared as `final`, excluding `__construct()` & `__destruct()` methods (so, to skip them, `init()` / `dinit()` methods can be declared in subcontrollers for these two methods as substitutes when needed.*
 
-*Note: All `__construct()` methods available for promoted parameters, and in these methods `parent::__construct()` calls can be skipped. Plus, all promoted parameters' types must be a valid / existing class name (primitive types and interfaces aren't supported).*
+*Note: All `__construct()` methods available for promoted parameters, and in these methods `parent::__construct()` calls can be skipped. Plus, all promoted parameter types must be a valid / existing class name (primitive types and interfaces aren't supported).*
 
 ### Optional `$use*` properties
 All these `$use*` properties must be declared in the subcontroller class as `true` (all defaults are `false`) and both `$repository` & `$session` properties and operations are dependent on the related config options (see [here](/docs/app#optional-properties-session-database-cache)).
@@ -94,9 +94,9 @@ class TokenController extends Controller {
 ```
 
 ### Constructor property promotion
-Constructor parameters can be promoted as a controller's properties while declaring `__construct()` methods. In these methods, `parent::__construct()` call can be skipped).
+Constructor parameters can be promoted as a controller's properties while declaring `__construct()` methods. In these methods, `parent::__construct()` call can be skipped.
 
-*Note: All promoted parameters' types must be a valid / existing class name, primitive types and interfaces aren't supported and service registry can be used for interface-based dependencies.*
+*Note: All promoted parameter types must be a valid / existing class name, primitive types and interfaces aren't supported and service registry can be used for interface-based dependencies.*
 
 ```php
 // File: app/system/TokenController.php
@@ -113,7 +113,7 @@ class TokenController extends Controller {
     public function tokenAction() {
         [$username, $password] = $this->request->post(['username', 'password']);
 
-        // Do some service works here.
+        // Do some service / user works here.
         $user = $this->service->findUserByUsername($username);
 
         // ...
@@ -515,8 +515,8 @@ public function someAction(Request $request, Response $response) {
 #### Getting GET|POST|COOKIE params
 There are several ways of getting request parameters, and this can be done using methods below that basically utilise `fetch()` method of `froq\http\request\Params` class ([source](//github.com/froq/froq/blob/master/src/http/request/Params.php)).
 
-_Note: All usages are same for `get*`, `post*` and `cookie*` methods of both controller and request objects._
-_Note: If a parameter isn't set, provied `map` or other callables won't be applied and `null` or given default will be returned._
+_Note: All uses are same for `get*`, `post*` and `cookie*` methods of both controller and request objects._ <br>
+_Note: When a parameter isn't set, provided `map` or other callables won't be applied and `null` or given default will be returned._
 
 ```php
 public function someAction() {
