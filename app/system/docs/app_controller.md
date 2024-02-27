@@ -476,7 +476,15 @@ $controller->segmentParam('show', default: null);
 $controller->segmentParams(['show'], defaults: []|null);
 ```
 
-### Request & Response
+### Injections
+While calling the target action, it's possible to inject some objects as action parameters at calltime if they meet the types below and have no NULL defaults.
+
+· Request / Response: `froq\http\Request` and `froq\http\Response`. <br>
+· Payloads: `froq\http\request\payload\FormPayload` (for form data), `froq\http\request\payload\JsonPayload` (for JSON data), `froq\http\request\payload\FilePayload` (for a single uploaded file), `froq\http\request\payload\FilesPayload` (for all uploaded files). <br>
+· DTO / VO Objects: Driven from `froq\app\data\DataObject` or `froq\app\data\ValueObject` class. <br>
+· Entities: Driven from `froq\database\entity\Entity` class.
+
+#### Request & Response
 Froq! aims to provide a smooth HTTP interaction to its users (developers) so they can enjoy while they're coding their projects, and to realise that, it brings two components named as `froq\http\Request`, `froq\http\Response` and equipped with many useful properties / methods. You can find more details about [Request](/docs/http-request) and [Response](/docs/http-response) documents.
 
 #### Injecting `Request` & `Response` objects
@@ -486,7 +494,6 @@ Although you can inject these objects into any action, they're just references o
 
 ```php
 use froq\http\{Request, Response};
-// ...
 
 // With path params (e.g: GET /some/:id).
 public function someAction(int $id, Request $request, Response $response) {
@@ -496,7 +503,7 @@ public function someAction(int $id, Request $request, Response $response) {
         'request_utime' => $request->utime,
     ];
 
-    $response->json(Status::OK, $content, /* headers: [], cookies: [] */);
+    // ...
 }
 
 // Without path params (e.g: GET /some?id=123).
@@ -507,10 +514,122 @@ public function someAction(Request $request, Response $response) {
         'request_utime' => $request->utime,
     ];
 
-    $response->json(Status::OK, $content, /* headers: [], cookies: [] */);
+    // ...
 }
 ```
 
+#### Injecting payload objects
+All payload objects proceeded by their relevant content type headers. So, `FilePayload` and `FilesPayload` need `multipart/form-data`,
+`FormPayload` needs `/x-www-form-urlencoded` or `multipart/form-data`, and `JsonPayload` needs any content type ending with `/json` (e.g: `application/json`).
+
+Note: You can use `$payload->okay` property to check whether the relevant content type was okey'ed by the target payload class at creation time.
+
+```php
+use froq\http\response\Status;
+use froq\http\request\payload\{FormPayload, JsonPayload, FilePayload, FilesPayload};
+
+// A form data dependent action.
+public function formAction(FormPayload $form) {
+    if (!$form->okay) {
+        throw $this->createHttpException(415);
+        // throw $this->createHttpException(Status::UNSUPPORTED_MEDIA_TYPE);
+        // throw new \froq\http\exception\client\UnsupportedMediaTypeException();
+    }
+
+    $id = $form->get('id');
+    [$id, $name] = $form->getAll(['id', 'name']);
+
+    // Access.
+    $id = $form['id'];
+
+    if (isset($form['id'])) {
+        // Proceed..
+    }
+
+    if (count($form)) {
+        // Proceed..
+    }
+
+    $data = [];
+    foreach ($form as $key => $value) {
+        $data[$key] = escape($value);
+    }
+
+    // ReadonlyError!
+    $form['id'] = 123;
+
+    // ...
+}
+
+// A JSON data dependent action.
+public function jsonAction(JsonPayload $json) {
+    // Same as formAction(), but needs a JSON content type header,
+    // such as "application/json", "text/json" etc.
+}
+
+// A file/files dependent action.
+public function uploadAction(FilePayload $file, FilesPayload $files) {
+    // Single file.
+    if ($file->exists()) {
+        if ($file->mime == 'image/jpeg') {
+            $to = format('/path/to/images/%s.jpg', $file->generateId('uuid'));
+            $file->move($to);
+        } else {
+            // Proceed..
+        }
+
+        // With options for more safety (@see froq\file\upload\Source).
+        $options = ['allowedMimes' => 'image/jpeg', 'allowedExtensions' => 'jpg,jpeg'];
+
+        try {
+            $file->move($to, $options);
+        } catch (Throwable $e) {
+            // Proceed..
+        }
+    }
+
+    if ($files->count()) {
+        foreach ($files as $file) {
+            // Same as above.
+        }
+    }
+}
+```
+
+#### Injecting DTO / VO objects
+
+```php
+use app\data\{UserDTO, UserVO};
+
+// A DTO dependent action.
+public function addAction(UserDTO $user) {
+    if ($user->validate()) {
+        // Proceed..
+    } else {
+        // Error..
+    }
+}
+
+// A VO dependent action.
+public function addAction(UserVO $user) {
+    // Proceed..
+}
+```
+
+#### Injecting Entity objects
+
+```php
+use app\entity\User;
+
+// An entity dependent action.
+public function addAction(User $user) {
+    try {
+        $user->save();
+    } catch (Throwable) {
+        // Proceed..
+    }
+}
+```
 
 #### Getting GET|POST|COOKIE params
 There are several ways of getting request parameters, and this can be done using methods below that basically utilise `fetch()` method of `froq\http\request\Params` class ([source](//github.com/froq/froq/blob/master/src/http/request/Params.php)).
