@@ -8,11 +8,10 @@ define('APP_START', microtime(true));
 require APP_DIR . '/app/Froq.php';
 
 try {
-    // Local dev check for dir.
-    if (!defined('__local__')) {
-        define('__local__', PHP_SAPI === 'cli-server');
+    $dir = null; // Local dev check.
+    if (getenv('HOME') === '/home/kerem') {
+        $dir = '/var/www/!froq';
     }
-    $dir = __local__ ? '/var/www/!froq' : null;
 
     /** Initialize. */
     Froq::init(root: '/', env: null, dir: $dir)
@@ -37,7 +36,5 @@ try {
     /** Run. */
     ->run();
 } catch (Throwable $e) {
-    error_log((string) $e);
-    // echo $e->getMessage(), "\n";
-    // echo $e->getTraceAsString();
+    Froq::error($e);
 }
