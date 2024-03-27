@@ -8,11 +8,12 @@ Application (as a class `froq\App` and internally a global variable `$app`) is t
 public function fooAction() {
     // true (if root is "/" as default or defined like "/api/v1").
     assert($this->app->isRoot());
-    assert($this->app->root === '/');
+    assert(($this->app->root === '/') === true);
 
     // true (if app is running on PHP's built-in server or a server like "foo.local").
-    assert($this->app->isLocal());
-    assert($this->app->env === \froq\Env::DEVELOPMENT);
+    assert($this->app->isLocal() === true);
+    assert($this->app->isDevelopment() === true);
+    assert(($this->app->env == \froq\AppEnv::DEVELOPMENT) === true);
 }
 ```
 
