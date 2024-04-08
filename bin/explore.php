@@ -25,15 +25,18 @@ $loader = froq\Autoloader::init($froqDir);
 $loader->register();
 
 // Default options.
-$options = ['sort' => true, 'drop' => false];
+$options = ['sort' => true, 'drop' => false, 'dirs' => null];
 
-// Argument options.
-$arguments = getopt('', ['no-sort', 'drop']);
+// Argument options (@see https://hotexamples.com/examples/-/-/getopt/php-getopt-function-examples.html#0xf9ece8ff405d63537039ab3109d73dce30d48cc67de91901e8acc7e12cb31a13-8,,33,).
+$arguments = getopt('', ['no-sort', 'drop', 'dirs:']);
 if (isset($arguments['no-sort'])) {
     $options['sort'] = false;
 }
 if (isset($arguments['drop'])) {
     $options['drop'] = true;
+}
+if (isset($arguments['dirs'])) {
+    $options['dirs'] = $arguments['dirs'];
 }
 
 // Required for autoloader.
@@ -46,15 +49,23 @@ if ($options['drop']) {
         echo 'No file exists such: "' . $mapFile .'", skipped.', PHP_EOL;
     } else {
         echo 'Dropping autoload map: "' . $mapFile . '" ... ';
-        $loader->explore('', $options);
+        $loader->explore('', ['drop' => true]);
         echo 'OK!', PHP_EOL;
     }
     return;
 }
 
-// Explore system & library folders.
-foreach (['/app/system', '/app/library'] as $directory) {
-    echo 'Generating autoload map for: "' . APP_DIR . $directory . '" ... ';
-    $loader->explore($directory, $options);
+// Default app directories.
+$dirs = ['/app/system', '/app/service', '/app/library'];
+
+if ($options['dirs']) {
+    $dirs = array_merge($dirs, array_filter(explode(',', $options['dirs'])));
+    $dirs = array_map(fn($dir) => '/' . ltrim($dir, '/'), $dirs);
+}
+
+// Explore directories.
+foreach ($dirs as $dir) {
+    echo 'Generating autoload map for: "' . APP_DIR . $dir . '" ... ';
+    $loader->explore($dir, $options);
     echo 'OK!', PHP_EOL;
 }
