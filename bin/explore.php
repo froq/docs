@@ -66,6 +66,10 @@ if ($options['dirs']) {
 // Explore directories.
 foreach ($dirs as $dir) {
     echo 'Generating autoload map for: "' . APP_DIR . $dir . '" ... ';
+    if (!is_dir(APP_DIR . $dir)) {
+        echo PHP_EOL, 'No directory exists such "' . APP_DIR . $dir . ', skipped.', PHP_EOL;
+        continue;
+    }
     $loader->explore($dir, $options);
     echo 'OK!', PHP_EOL;
 }
