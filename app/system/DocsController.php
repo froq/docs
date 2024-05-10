@@ -41,7 +41,7 @@ class DocsController extends AppController {
         $name = xstring($id)
             ->replace(['-'], ['_']) // Function "_" is internal.
             ->slice(0, 50)          // Enough for a file name.
-            ->slug(preserve: '_')
+            ->slug(preserve: '_', trim: false)
         ;
 
         $file = new File(format('%s/app/system/docs/%s.md', APP_DIR, $name));
