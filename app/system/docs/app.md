@@ -10,10 +10,13 @@ public function fooAction() {
     assert($this->app->isRoot() === true);
     assert(($this->app->root === '/api/v1') === true);
 
+    // Environment property.
+    assert($this->app->env instanceof \froq\AppEnv);
+
     // true (if app is running on PHP's built-in server or a server like "foo.local").
-    assert($this->app->isLocal() === true);
-    assert($this->app->isDevelopment() === true);
-    assert(($this->app->env == \froq\AppEnv::DEVELOPMENT) === true);
+    assert($this->app->env->isLocal() === true);
+    assert($this->app->env->isDevelopment() === true);
+    assert(($this->app->env == \froq\AppEnv::DEVELOPMENT) === true); // Mind "==" here.
 }
 ```
 
