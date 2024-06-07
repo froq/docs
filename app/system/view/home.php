@@ -5,7 +5,7 @@
 
     <p>Froq! neither follows MVC architecture rules nor contains a Model component, but instead, it makes use of Controller, Repository and View components.</p>
 
-    <p>Froq! can also be used as a micro framework as you might be familiar with <a href="//slimframework.com/">Slim</a> framework.</p>
+    <p>Froq! can also be used as a micro framework that you might be familiar with <a href="//slimframework.com/">Slim</a> framework.</p>
 
     <br>
 
