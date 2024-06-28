@@ -20,7 +20,7 @@ class BookRepository extends Repository {
     public function find(int $id): ?array {
         /** @var froq\database\Query */
         return $this->initQuery('books')
-            ->select()
+            ->select('*')
             ->where('id', [$id])
             ->get();
     }
@@ -29,7 +29,7 @@ class BookRepository extends Repository {
     public function findAll(QueryParams $qp, ?int $page = null, int $limit = 10): ?array {
         /** @var froq\database\Query */
         return $this->initQuery('books')
-            ->select()
+            ->select('*')
             ->where($qp)
             ->order('id', 'DESC')
             ->paginate($page, $limit)
