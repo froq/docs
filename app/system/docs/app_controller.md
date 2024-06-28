@@ -382,8 +382,8 @@ $controller->getShortName(suffix: true);        // "PostController"
 $controller->getActionName());                  // "showAction"
 $controller->getActionShortName());             // "show"
 $controller->getActionShortName(suffix: true)); // "showAction"
-$controller->getPath();                         // Post.show
-$controller->getPath(full: true);               // app.controller.Post.showAction
+$controller->getCall();                         // Post.show
+$controller->getCall(full: true);               // app.controller.Post.showAction
 ```
 
 ### Working with parameters
