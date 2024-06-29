@@ -15,13 +15,13 @@
 
     <pre><code class="language-php">
     // app/config/routes.php
-    ['/hello/:name', 'Hello.say']
+    '/hello/:name' => 'Hello.say',
 
     // app/system/HelloController.php
     namespace app\controller;
 
     class HelloController extends \froq\app\Controller {
-        function sayAction($name) {
+        function sayAction(string $name): void {
             echo "Hello, ", escape($name), "!\n";
         }
     }
@@ -32,7 +32,7 @@
     <p>And as mentioned before, you can also use Froq! as a micro framework. Just open <code>pub/index.php</code> file and add your routes with callbacks as below:</p>
 
     <pre><code class="language-php">
-    $app->get('/hello/:name', function ($name) {
+    $app->get('/hello/:name', function (string $name): void {
         echo "Hello, ", escape($name), "!\n";
     });
     </code></pre>
