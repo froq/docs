@@ -26,7 +26,7 @@ class BookRepository extends Repository {
     }
 
     /** @return array<array>|null */
-    public function findAll(QueryParams $qp, ?int $page = null, int $limit = 10): ?array {
+    public function findAll(QueryParams $qp, int $page, int $limit = 10): ?array {
         /** @var froq\database\Query */
         return $this->initQuery('books')
             ->select('*')
@@ -71,7 +71,7 @@ class BookController extends Controller {
         }
 
         /** @var array<array>|null */
-        $books = $this->repository->findAll($qp, $page ?? null);
+        $books = $this->repository->findAll($qp, $page ?? 1);
         $status = $books ? Status::OK : Status::NOT_FOUND;
 
         return $this->view('search', ['books' => $books], $status);
