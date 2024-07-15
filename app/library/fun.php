@@ -4,7 +4,7 @@ const PAGE_TITLE = 'Froq! Framework';
 const PAGE_DESCRIPTION = 'Froq! Hassle-free PHP framework.';
 
 function page_title(): string {
-    $view = app()->registry()::get('@view');
+    $view = app()::registry()::get('@view');
     $title = $view->getData('title');
 
     return join(' | ', filter([PAGE_TITLE, $title]));
