@@ -483,6 +483,7 @@ While calling the target action, it's possible to inject some objects as action 
 · Payloads: `froq\http\request\payload\FormPayload` (for form data), `froq\http\request\payload\JsonPayload` (for JSON data), `froq\http\request\payload\FilePayload` (for a single uploaded file), `froq\http\request\payload\FilesPayload` (for all uploaded files). <br>
 · DTO / VO Objects: Driven from `froq\app\data\DataObject` or `froq\app\data\ValueObject` class. <br>
 · Entities: Driven from `froq\database\entity\Entity` class.
+· All other valid / existing classes.
 
 #### Request & Response
 Froq! aims to provide a smooth HTTP interaction to its users (developers) so they can enjoy while they're coding their projects, and to realise that, it brings two components named as `froq\http\Request`, `froq\http\Response` and equipped with many useful properties / methods. You can find more details about [Request](/docs/http-request) and [Response](/docs/http-response) documents.
@@ -628,6 +629,24 @@ public function addAction(User $user) {
     } catch (Throwable) {
         // Proceed..
     }
+}
+```
+
+#### Injecting other objects
+
+```php
+use app\library\Hello;
+use app\repository\BookRepository;
+
+// Inject a regular object.
+public function helloAction(Hello $hello) {
+    echo $hello->say();
+}
+
+// Inject a repository object.
+public function booksAction(BookRepository $repository) {
+    $books = $repository->findAll();
+    return $this->view('books', ['books' => $books]);
 }
 ```
 
