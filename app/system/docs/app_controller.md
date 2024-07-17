@@ -482,7 +482,7 @@ While calling the target action, it's possible to inject some objects as action 
 · Request / Response: `froq\http\Request` and `froq\http\Response`. <br>
 · Payloads: `froq\http\request\payload\FormPayload` (for form data), `froq\http\request\payload\JsonPayload` (for JSON data), `froq\http\request\payload\FilePayload` (for a single uploaded file), `froq\http\request\payload\FilesPayload` (for all uploaded files). <br>
 · DTO / VO Objects: Driven from `froq\app\data\DataObject` or `froq\app\data\ValueObject` class. <br>
-· Entities: Driven from `froq\database\entity\Entity` class.
+· Entities: Driven from `froq\database\entity\Entity` class. <br>
 · All other valid / existing classes.
 
 #### Request & Response
