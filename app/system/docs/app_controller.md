@@ -482,6 +482,7 @@ While calling the target action, it's possible to inject some objects as action 
 · Request / Response: `froq\http\Request` and `froq\http\Response`. <br>
 · Payloads: `froq\http\request\payload\FormPayload` (for form data), `froq\http\request\payload\JsonPayload` (for JSON data), `froq\http\request\payload\FilePayload` (for a single uploaded file), `froq\http\request\payload\FilesPayload` (for all uploaded files). <br>
 · DTO / VO Objects: Driven from `froq\app\data\DataObject` or `froq\app\data\ValueObject` class. <br>
+· Input Objects (simple DTOs): Driven from `froq\app\data\InputInterface` interface. <br>
 · Entities: Driven from `froq\database\entity\Entity` class. <br>
 · All other valid / existing classes.
 
@@ -614,6 +615,43 @@ public function addAction(UserDTO $user) {
 // A VO dependent action.
 public function addAction(UserVO $user) {
     // Proceed..
+}
+```
+
+#### Injecting Input objects (simple DTOs)
+Population data comes from `$_POST` for POST, PUT, PATCH methods, and for all other methods it comes from `$_GET` data. All path params will be used to map DTO objects, so some global params won't be used if they're already presented in path params (`$mappingData = $pathParams + $_POST`).
+
+```php
+class BookDto implements \froq\app\data\InputInterface {
+    public ?int $id;
+    public ?string $name;
+    // ...
+
+    // Simple validation.
+    public function isValid(): bool {
+        return !empty($this->name);
+    }
+}
+```
+```php
+// @call POST /book
+public function addAction(BookDto $book) {
+    assert($book->id === null);
+
+    if ($book->isValid()) {
+        $book = $this->repository->add((array) $book);
+        // ...
+    }
+}
+
+// @call PUT /book/:id
+public function editAction(int $id, BookDto $book) {
+    assert($book->id === $id);
+
+    if ($book->isValid()) {
+        $book = $this->repository->edit($id, (array) $book);
+        // ...
+    }
 }
 ```
 
