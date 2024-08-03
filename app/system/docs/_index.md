@@ -35,8 +35,12 @@ EntityList : app\repository\PostEntityList => app/system/Post/PostEntityList.php
                                            or app/system/Post/data/PostEntityList.php
 Query      : app\repository\PostQuery      => app/system/Post/PostQuery.php
                                            or app/system/Post/data/PostQuery.php
-Search      : app\repository\PostSearch    => app/system/Post/PostSearch.php
+Search     : app\repository\PostSearch     => app/system/Post/PostSearch.php
                                            or app/system/Post/data/PostSearch.php
+Resource   : app\repository\PostResource   => app/system/Post/PostResource.php
+                                           or app/system/Post/data/PostResource.php
+DTOs       : app\repository\PostDto        => app/system/Post/PostDto.php
+                                           or app/system/Post/data/PostDto.php
 # Library items.
 Library    : app\library\PostHelper        => app/library/PostHelper.php
 ```
