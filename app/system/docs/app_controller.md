@@ -481,10 +481,15 @@ While calling the target action, it's possible to inject some objects as action 
 
 · Request / Response: `froq\http\Request` and `froq\http\Response`. <br>
 · Payloads: `froq\http\request\payload\FormPayload` (for form data), `froq\http\request\payload\JsonPayload` (for JSON data), `froq\http\request\payload\FilePayload` (for a single uploaded file), `froq\http\request\payload\FilesPayload` (for all uploaded files). <br>
-· DTO / VO Objects: Driven from `froq\app\data\DataObject` or `froq\app\data\ValueObject` class. <br>
-· Input Objects (simple DTOs): Driven from `froq\app\data\InputInterface` interface. <br>
-· Entities: Driven from `froq\database\entity\Entity` class. <br>
+· Params: `froq\http\request\params\GetParams` (for `$_GET`), `froq\http\request\params\PostParams` (for `$_POST`), and `froq\http\request\params\SegmentParams` (for segments). <br>
+. Sessions: Instance of `froq\session\Session` created by `App` instance if `$useSession` is true in the action's controller, otherwise a new instance will be created with/without session config. <br>
+· DO / VO Objects: Derived from `froq\app\data\DataObject` or `froq\app\data\ValueObject` class. <br>
+· Input Objects (simple DTOs): Derived from `froq\app\data\InputInterface` interface. <br>
+· Entities: Derived from `froq\database\entity\Entity` class. <br>
+· Repositories: Derived from `froq\app\data\Repository` class (if the action's controller sets `$useRepository` to true and its repository is the same as the injected repository, the controller's repository instance will be used). <br>
 · All other valid / existing classes.
+
+*Note: Do NOT use same names for injected parameter names with route (path / segment) parameter names. If a route is like `/book/:id`, then `$id` parameter will be passed to the target action, and that action cannot inject an object that named as `id`.*
 
 #### Request & Response
 Froq! aims to provide a smooth HTTP interaction to its users (developers) so they can enjoy while they're coding their projects, and to realise that, it brings two components named as `froq\http\Request`, `froq\http\Response` and equipped with many useful properties / methods. You can find more details about [Request](/docs/http-request) and [Response](/docs/http-response) documents.
@@ -520,7 +525,7 @@ public function someAction(Request $request, Response $response) {
 }
 ```
 
-#### Injecting payload objects
+#### Injecting Payload objects
 All payload objects proceeded by their relevant content type headers. So, `FilePayload` and `FilesPayload` need `multipart/form-data`,
 `FormPayload` needs `/x-www-form-urlencoded` or `multipart/form-data`, and `JsonPayload` needs any content type ending with `/json` (e.g: `application/json`).
 
@@ -598,13 +603,53 @@ public function uploadAction(FilePayload $file, FilesPayload $files) {
 }
 ```
 
-#### Injecting DTO / VO objects
+#### Injecting Params objects
 
 ```php
-use app\data\{UserDTO, UserVO};
+use froq\http\request\params\GetParams;
+use froq\http\request\params\PostParams;
+use froq\http\request\params\SegmentParams;
 
-// A DTO dependent action.
-public function addAction(UserDTO $user) {
+public function getAction(GetParams $params) {
+    $id = $params->getInt('id');
+    // Proceed..
+}
+public function postAction(PostParams $params) {
+    $email = $params->getString('email');
+    $password = $params->getString('password');
+    // Proceed..
+}
+
+// @call DELETE /book/:bid/comment/:cid
+public function segmentAction(SegmentParams $params) {
+    $bookId = $params->getInt('book');
+    $commentId = $params->getInt('comment');
+    // Proceed..
+}
+```
+
+#### Injecting Session objects
+
+```php
+use froq\session\Session;
+
+// @call POST /user/login
+public function loginAction(Session $session) {
+    $session->start();
+    // ...
+    if ($user = $this->doLogin($email, $password)) {
+        $session->set('user', $user);
+    }
+}
+```
+
+#### Injecting DO / VO objects
+
+```php
+use app\data\{UserDO, UserVO};
+
+// A DO dependent action.
+public function addAction(UserDO $user) {
     if ($user->validate()) {
         // Proceed..
     } else {
@@ -655,18 +700,22 @@ public function editAction(int $id, BookDto $book) {
 }
 ```
 
-#### Injecting Entity objects
+#### Injecting Entity & Repository objects
 
 ```php
-use app\entity\User;
-
 // An entity dependent action.
-public function addAction(User $user) {
+public function addAction(Book $book) {
     try {
-        $user->save();
+        $book->save();
     } catch (Throwable) {
         // Proceed..
     }
+}
+
+// Inject a repository object.
+public function showAction(int $id, BookRepository $repository) {
+    $book = $repository->find($id);
+    // Proceed..
 }
 ```
 
@@ -674,17 +723,10 @@ public function addAction(User $user) {
 
 ```php
 use app\library\Hello;
-use app\repository\BookRepository;
 
 // Inject a regular object.
 public function helloAction(Hello $hello) {
     echo $hello->say();
-}
-
-// Inject a repository object.
-public function booksAction(BookRepository $repository) {
-    $books = $repository->findAll();
-    return $this->view('books', ['books' => $books]);
 }
 ```
 
