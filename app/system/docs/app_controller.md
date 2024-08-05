@@ -477,7 +477,7 @@ $controller->segmentParams(['show'], defaults: []|null);
 ```
 
 ### Injections
-While calling the target action, it's possible to inject some objects as action parameters at calltime if they meet the types below and have no NULL defaults.
+While calling the target action, it's possible to inject some objects as action parameters at calltime if they meet the types below;
 
 · Request / Response: `froq\http\Request` and `froq\http\Response`. <br>
 · Payloads: `froq\http\request\payload\FormPayload` (for form data), `froq\http\request\payload\JsonPayload` (for JSON data), `froq\http\request\payload\FilePayload` (for a single uploaded file), `froq\http\request\payload\FilesPayload` (for all uploaded files). <br>
@@ -500,28 +500,22 @@ It's easy to inject these objects into an action in-place and on-demand by decla
 Although you can inject these objects into any action, they're just references of `$request` and `$response` properties of controllers and instead of injecting them, you can also use them just like `$this->request` or `$this->response` in controllers.
 
 ```php
-use froq\http\{Request, Response};
-
-// With path params (e.g: GET /some/:id).
-public function someAction(int $id, Request $request, Response $response) {
-    $content = [
-        'id' => $id,
-        'request_time' => $request->time,
-        'request_utime' => $request->utime,
-    ];
-
-    // ...
-}
+use froq\http\{Request, Response, response\Status};
 
 // Without path params (e.g: GET /some?id=123).
 public function someAction(Request $request, Response $response) {
-    $content = [
+    $response->json(Status::OK, [
         'id' => (int) $request->get('id'),
         'request_time' => $request->time,
-        'request_utime' => $request->utime,
-    ];
+    ]);
+}
 
-    // ...
+// With path params (e.g: GET /some/:id).
+public function someAction(int $id, Request $request, Response $response) {
+    $response->json(Status::OK, [
+        'id' => $id,
+        'request_time' => $request->time,
+    ]);
 }
 ```
 
