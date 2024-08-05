@@ -500,7 +500,8 @@ It's easy to inject these objects into an action in-place and on-demand by decla
 Although you can inject these objects into any action, they're just references of `$request` and `$response` properties of controllers and instead of injecting them, you can also use them just like `$this->request` or `$this->response` in controllers.
 
 ```php
-use froq\http\{Request, Response, response\Status};
+use froq\http\response\Status;
+use froq\http\{Request, Response};
 
 // Without path params (e.g: GET /some?id=123).
 public function someAction(Request $request, Response $response) {
